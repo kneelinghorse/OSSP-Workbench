@@ -1,0 +1,53 @@
+{
+  "urn": "urn:proto:data:commerce-orders-api/schema/address@1.2.0",
+  "metadata": {
+    "kind": "data",
+    "name": "Address Schema",
+    "version": "1.2.0",
+    "status": "derived",
+    "description": "Schema extracted from OpenAPI component: Address",
+    "tags": [
+      "openapi",
+      "schema",
+      "demo"
+    ]
+  },
+  "schema": {
+    "name": "Address",
+    "source": "openapi-component",
+    "ownerServiceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+    "definition": {
+      "type": "object",
+      "required": [
+        "line1",
+        "city",
+        "state",
+        "postalCode",
+        "country"
+      ],
+      "properties": {
+        "line1": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "relationships": {
+    "dependencies": [],
+    "consumers": [
+      "urn:proto:api:commerce-orders-api/service@1.2.0"
+    ]
+  }
+}

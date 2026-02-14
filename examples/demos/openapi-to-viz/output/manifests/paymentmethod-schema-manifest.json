@@ -1,0 +1,50 @@
+{
+  "urn": "urn:proto:data:commerce-orders-api/schema/paymentmethod@1.2.0",
+  "metadata": {
+    "kind": "data",
+    "name": "PaymentMethod Schema",
+    "version": "1.2.0",
+    "status": "derived",
+    "description": "Schema extracted from OpenAPI component: PaymentMethod",
+    "tags": [
+      "openapi",
+      "schema",
+      "demo"
+    ]
+  },
+  "schema": {
+    "name": "PaymentMethod",
+    "source": "openapi-component",
+    "ownerServiceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+    "definition": {
+      "type": "object",
+      "required": [
+        "type",
+        "last4"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "CARD",
+            "BANK_ACCOUNT"
+          ]
+        },
+        "last4": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 4
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "relationships": {
+    "dependencies": [],
+    "consumers": [
+      "urn:proto:api:commerce-orders-api/service@1.2.0"
+    ]
+  }
+}

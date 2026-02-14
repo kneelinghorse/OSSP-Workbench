@@ -1,0 +1,45 @@
+name: "Build.Implementation.v1"
+version: "1.0.0"
+displayName: "Implementation Mission"
+
+missionId: "B14.4-20251028"
+objective: >
+  Implement and validate a cross-platform GUI-aware `--open` wrapper for the CLI,
+  ensuring safe behavior across macOS, Windows, and Linux, including headless CI environments.
+
+context: |
+  R14.4 (Strategy-for-the-CLI--open-Flag) documented system-specific command patterns and risks.  
+  This mission integrates those findings into the CLI UX layer and adds automated OS-level tests.
+
+successCriteria:
+  - "`--open` works on all major platforms without blocking CLI execution."
+  - "Headless CI mode detects absence of GUI and skips open safely."
+  - "Exit codes consistent (0 = success, >0 = error with message)."
+  - "Behavior documented in CLI developer guide."
+
+deliverables:
+  - "/app/src/cli/utils/open-guardian.ts"
+  - "/app/tests/cli/open-guardian.test.ts"
+  - "/app/docs/dev/open-flag-behavior.md"
+  - "CI matrix jobs (Windows/macOS/Linux) for validation"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "R14.4 identified safe commands and edge cases for `open` across OSes."
+      source: "/missions/research/R14.4_Strategy-for-the-CLI--open-Flag.md"
+  implementationScope:
+    coreDeliverable: >
+      1) Guardian module detects OS and GUI availability; selects safe command.  
+      2) Implements non-blocking spawn for `open`, `start`, `xdg-open`.  
+      3) CI matrix tests all OS variants.  
+      4) Update CLI commands to route --open through Guardian.
+  validationProtocol:
+    - validator: "CI-full"
+      focus: "Cross-platform matrix green build."
+    - validator: "Local"
+      focus: "Manual tests confirm expected behavior per OS."
+  handoffContext:
+    completed:
+      - "Open-Guardian wrapper stable and documented."
+    nextMission: "B14.5-20251028"

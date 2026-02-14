@@ -1,0 +1,71 @@
+name: "Build.Implementation.v1"
+version: "1.0.0"
+displayName: "Implementation Mission"
+
+missionId: "M13.2-20251013"
+objective: >
+  Implement the catalog→graph builder that emits the canonical node/edge JSON used by the Draw.io exporter.
+  Provide filters (by domain/type/URN prefix), schema validation, and a stable ID strategy.
+
+context: |
+  This is the canonical property-graph model for visualization and future analysis. It must be tool-agnostic,
+  validated, and filterable. Source research:
+    - /missions/research/r.13.2_unified-graph-schema.md         :contentReference[oaicite:6]{index=6}
+    - /missions/research/r.13.1_Draw.io Diagrams_specs.md       :contentReference[oaicite:7]{index=7}
+    - /missions/research/r.13.4_Draw.io-Performance-and-Scaling.md (size-aware filtering guidance) :contentReference[oaicite:8]{index=8}
+
+successCriteria:
+  - "Given a set of manifests in the catalog, builder outputs valid graph JSON (schema-checked) with stable ids."
+  - "Filter flags reduce graph size by domain/type/URN; output remains schema-valid."
+  - "Round-trip with M13.1: graph JSON → .drawio succeeds on first try (no missing fields)."
+
+deliverables:
+  - "/app/src/catalog/graph/builder.ts               # catalog → canonical graph"
+  - "/app/src/catalog/graph/schema.json              # JSON Schema (nodes/edges) aligned with R13.2"
+  - "/app/cli/commands/catalog-build-graph.ts        # optional dev aid: emits graph JSON to stdout/path"
+  - "/app/tests/catalog/graph/builder.test.ts        # asserts schema validity, filters, determinism"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Directed property graph with explicit fields (id,type,title,urn,path,domain,+metadata)."
+      source: "/missions/research/r.13.2_unified-graph-schema.md"  :contentReference[oaicite:9]{index=9}
+  implementationScope:
+    coreDeliverable: >
+      1) Implement traversal over catalog entries to produce nodes/edges.
+      2) ID strategy: content-derived hash of URN/path for stability.
+      3) Filters: --domain, --type, --urn-prefix; reject empty graphs with clear errors.
+      4) Validate output against schema.json; fail fast with actionable messages.
+    outOfScope:
+      - "Graph DB persistence; keep file output and in-memory use."
+  plan:
+    - id: schema
+      description: "Encode schema.json from R13.2 tables; provide TS types via json-schema-to-ts."
+    - id: build
+      description: "Assemble nodes/edges; dedupe; ensure directionality and label mapping."
+    - id: filters
+      description: "Apply filters before serialization; ensure consistent counts."
+    - id: tests
+      description: "Fixtures of 10–15 manifests; filter permutations; golden JSON snapshots."
+  validationProtocol:
+    - validator: "CI-fast"
+      focus: "Schema validation + snapshots deterministic."
+  handoffContext:
+    completed:
+      - "Canonical graph builder ready for M13.1 exporter."
+    interfaces:
+      - "app-cli catalog build-graph [--domain api --type workflow --urn-prefix urn:...]" 
+    assumptions:
+      - "Catalog loader and validators already present."
+    nextMission: "M13.3-20251013"
+    blockers: []
+
+outcome:
+  status: Completed
+  summary: >
+    Delivered canonical catalog graph builder with schema validation, CLI integration, and targeted tests for filtering and stability.
+  artifacts:
+    - app/src/catalog/graph/builder.js
+    - app/src/catalog/graph/schema.json
+    - app/cli/commands/catalog-build-graph.js
+    - app/tests/catalog/graph/builder.test.ts

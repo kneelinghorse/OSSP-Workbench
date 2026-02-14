@@ -1,0 +1,64 @@
+name: "Build.Implementation.v1"
+version: "1.0.0"
+displayName: "Implementation Mission"
+
+missionId: "M13.4-20251013"
+objective: >
+  Add size-aware guardrails and optional decomposition strategies to keep diagrams responsive:
+  thresholds, warnings, and optional multi-page/layered exports for large catalogs.
+
+context: |
+  Draw.io performance is governed far more by file size/asset complexity than raw node count.
+  Implement programmatic thresholds and mitigation: pre-filtering, layer grouping, and optional linked sub-diagrams.
+  Source research:
+    - /missions/research/r.13.4_Draw.io-Performance-and-Scaling.md  :contentReference[oaicite:14]{index=14}
+    - /missions/research/r.13.2_unified-graph-schema.md              :contentReference[oaicite:15]{index=15}
+
+successCriteria:
+  - "Exporter emits warnings when graph exceeds WARNING (≥250 nodes OR ≥5MB est) or CRITICAL (≥400 nodes OR ≥10MB est)."
+  - "CLI prints non-intrusive tip with mitigation (filters, layers, split)."
+  - "Optional flags: --layer-by <property> (e.g., domain), --split-by <property> (generate multi-page or separate files)."
+  - "Generated artifacts remain valid .drawio and open quickly for WARNING-range graphs when mitigations are applied."
+
+deliverables:
+  - "/app/src/visualization/drawio/guardrails.ts       # size estimator & thresholds"
+  - "/app/src/visualization/drawio/decompose.ts        # layer/split strategies (opt-in)"
+  - "/app/tests/visualization/drawio/guardrails.test.ts"
+  - "/app/docs/dev/drawio-scaling-guide.md             # tips, thresholds, layering/splitting examples"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Warning at ~250 nodes or 5MB; critical beyond ~400 nodes or 10MB; avoid embedded assets; layer/paginate."
+      source: "/missions/research/r.13.4_Draw.io-Performance-and-Scaling.md"  :contentReference[oaicite:16]{index=16}
+  implementationScope:
+    coreDeliverable: >
+      1) Implement estimator (nodes, label length proxy, edge count) → projected file size band.
+      2) Emit structured warnings to CLI (do not fail build by default).
+      3) Optional mitigations:
+         - --layer-by domain (group nodes on separate layers)
+         - --split-by domain (multi-page or separate .drawio files with index)
+      4) Document best practices (no embedded images; external links if needed).
+    outOfScope:
+      - "Full interactive viewer or CDN asset service."
+  plan:
+    - id: estimate
+      description: "Size/latency estimator returning tier: optimal/warning/critical + suggested flags."
+    - id: decompose
+      description: "Implement layering & split; generate index diagram with links when split."
+    - id: docs-tests
+      description: "Write scaling guide; unit tests proving thresholds and decomposition outputs."
+  validationProtocol:
+    - validator: "Local"
+      focus: "WARNING/CRITICAL thresholds trigger; -–layer-by/-–split-by reduce output size/latency."
+    - validator: "CI-full"
+      focus: "Synthetic 250/400-node graphs behave per spec."
+  handoffContext:
+    completed:
+      - "Exporter has guardrails and optional decomposition for large catalogs."
+    interfaces:
+      - "app-cli catalog generate-diagram [--layer-by domain] [--split-by domain]"
+    assumptions:
+      - "Rough estimator is acceptable; exact bytes vary by labels and styles."
+    nextMission: ""
+    blockers: []

@@ -1,0 +1,55 @@
+{
+  "urn": "urn:proto:data:commerce-orders-api/schema/customer@1.2.0",
+  "metadata": {
+    "kind": "data",
+    "name": "Customer Schema",
+    "version": "1.2.0",
+    "status": "derived",
+    "description": "Schema extracted from OpenAPI component: Customer",
+    "tags": [
+      "openapi",
+      "schema",
+      "demo"
+    ]
+  },
+  "schema": {
+    "name": "Customer",
+    "source": "openapi-component",
+    "ownerServiceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+    "definition": {
+      "type": "object",
+      "required": [
+        "id",
+        "email",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "name": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/components/schemas/Address"
+        },
+        "defaultPaymentMethod": {
+          "$ref": "#/components/schemas/PaymentMethod"
+        }
+      }
+    }
+  },
+  "relationships": {
+    "dependencies": [
+      "urn:proto:data:commerce-orders-api/schema/address@1.2.0",
+      "urn:proto:data:commerce-orders-api/schema/paymentmethod@1.2.0"
+    ],
+    "consumers": [
+      "urn:proto:api:commerce-orders-api/service@1.2.0"
+    ]
+  }
+}

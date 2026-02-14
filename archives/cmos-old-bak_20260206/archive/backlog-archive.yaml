@@ -1,0 +1,268 @@
+# backlog.yaml - Sprint Plan Metadata
+name: "Planning.SprintPlan.v1"
+version: "1.0.0"
+displayName: "Sprint Plan Orchestrator"
+description: "Master backlog tracking all sprints, missions, and dependencies"
+author: "OSSP-AGI Team"
+
+---
+
+# Mission File: project-main-backlog.yaml
+
+missionId: "SP-MAIN-001"
+
+objective: "To successfully track, manage, and complete all planned development sprints from foundation through final delivery."
+
+context: |
+  This mission file represents the master backlog and sprint plan for the OSSP-AGI project.
+  It provides a single source of truth for what has been completed, what is in progress, and what is planned.
+  This structured format allows for automated status tracking and dependency management.
+
+successCriteria:
+  - "All missions within the current sprint are moved through 'Current' to 'Completed' status."
+  - "Sprint transitions are properly documented with learnings captured."
+
+deliverables:
+  - "A fully updated version of this mission file with accurate sprint and mission status."
+
+domainFields:
+  type: "Planning.SprintPlan.v1"
+
+  sprints:
+    # Completed Sprints
+    - sprintId: "Sprint 1"
+      title: "Foundation - Core Protocol Suite"
+      focus: "Basic protocol definitions and CLI framework"
+      status: "Completed"
+      missions:
+        - { id: "B1.1", name: "OpenAPI Importer", status: "Completed" }
+        - { id: "B1.2", name: "Postgres Importer", status: "Completed" }
+        - { id: "B1.3", name: "CLI Framework", status: "Completed" }
+        - { id: "B1.4", name: "Draft/Approve Workflow", status: "Completed" }
+        - { id: "B1.5", name: "End-to-End Testing", status: "Completed" }
+
+    - sprintId: "Sprint 2"
+      title: "Protocol Graph & Validation"
+      focus: "Graph operations, validators, and community overrides"
+      status: "Completed"
+      missions:
+        - { id: "B2.1", name: "ProtocolGraph", status: "Completed" }
+        - { id: "B2.2", name: "Validators & Diff Engine", status: "Completed" }
+        - { id: "B2.3", name: "Community Overrides", status: "Completed" }
+        - { id: "B2.4", name: "GOVERNANCE.md Generator", status: "Completed" }
+        - { id: "B2.5", name: "Curated Seeds", status: "Completed" }
+
+    - sprintId: "Sprint 3"
+      title: "Web Viewer & Semantic Protocol"
+      focus: "Express server, React viewer, and semantic self-documentation"
+      status: "Completed"
+      missions:
+        - { id: "B3.1", name: "Express Server", status: "Completed" }
+        - { id: "B3.2", name: "React Viewer", status: "Completed" }
+        - { id: "B3.3", name: "Semantic Dogfooding", status: "Completed" }
+        - { id: "B3.4", name: "Alt-Click Inspection", status: "Completed" }
+
+    - sprintId: "Sprint 4"
+      title: "AsyncAPI Integration & Consumer Generation"
+      focus: "Event protocol support with consumer code generation"
+      status: "Completed"
+      missions:
+        - { id: "B4.1", name: "AsyncAPI Importer Foundation", status: "Completed" }
+        - { id: "B4.2", name: "Event-Specific Patterns", status: "Completed" }
+        - { id: "B4.3", name: "Event Governance", status: "Completed" }
+        - { id: "B4.4", name: "Consumer Generation", status: "Completed" }
+
+    - sprintId: "Sprint 5"
+      title: "Catalog Infrastructure & Security"
+      focus: "Catalog indexing, query engine, and security redaction"
+      status: "Completed"
+      missions:
+        - { id: "B5.1", name: "Catalog Index & Query Engine", status: "Completed" }
+        - { id: "B5.2", name: "Security Redaction Utilities", status: "Completed" }
+
+    - sprintId: "Sprint 7"
+      title: "Protocol Suite Enhancement"
+      focus: "OpenAPI parser, agent registration, workflow library, and feedback system"
+      status: "Completed"
+      missions:
+        - { id: "B7.1.0", name: "OpenAPI Parser Core Implementation", status: "Completed" }
+        - { id: "B7.1.1", name: "Parser Extensions & Error Model", status: "Completed" }
+        - { id: "B7.2.0", name: "Agent Registration State Machine", status: "Completed" }
+        - { id: "B7.2.1", name: "Registry & Graph Integration", status: "Completed" }
+        - { id: "B7.3.0", name: "Workflow Definition Library", status: "Completed" }
+        - { id: "B7.4.0", name: "Structured Feedback System", status: "Completed" }
+
+    # Current Sprint (previously)
+    - sprintId: "Sprint 8"
+      title: "Runtime Integration & Agent Enablement"
+      focus: "Replace stubs, wire real A2A/MCP clients, publish capability manifests, add discovery/URN resolution, and prove multi-agent execution end-to-end"
+      status: "Completed"
+      missions:
+        - { id: "B8.1", name: "A2A HTTP Client (replace stub)", status: "Completed" }
+        - { id: "B8.2", name: "MCP Client Integration (execute real tools)", status: "Completed" }
+        - { id: "B8.3", name: "Agent Capability Manifest (ACM) & /.well-known", status: "Completed" }
+        - { id: "B8.4", name: "URN Registry & Agent Discovery", status: "Completed" }
+        - { id: "B8.5", name: "Runtime Error Handling & Resilience", status: "Completed" }
+        - { id: "B8.6", name: "Multi-Agent E2E (A2A → Discovery → MCP)", status: "Completed" }
+        - { id: "B8.7", name: "CI Gate for Runtime Integration", status: "Completed" }
+        - { id: "B8.8", name: "Internal Runtime Docs (Builder-Facing Only)", status: "Completed" }
+
+    - sprintId: "Sprint 9"
+      title: "Performance, Validation & Integration Enablement"
+      focus: "Harden MCP server, deliver cross-protocol validation engine, improve developer workflow"
+      status: "Completed"
+      missions:
+        - { id: "B9.1", name: "Performance Optimization & Hardening", status: "Completed" }
+        - { id: "B9.2", name: "Cross-Protocol Validation Engine", status: "Completed" }
+        - { id: "B9.3", name: "Enhanced Tooling & Integration Examples", status: "Completed" }
+
+    - sprintId: "Sprint 10"
+      title: "Protocol Suite Completion & Internal Tooling"
+      focus: "Close functional gaps, deepen validation, improve developer tools, and provide comprehensive internal examples and documentation"
+      status: "Completed"
+      missions:
+        - { id: "B10.1", name: "Workflow Fixes & Validation Gaps", status: "Completed" }
+        - { id: "B10.2", name: "Extended Protocol Generators & Validators", status: "Completed" }
+        - { id: "B10.3", name: "Deep Cross-Protocol Relationship Validation", status: "Completed" }
+        - { id: "B10.4", name: "CLI Enhancement & Error Handling", status: "Completed" }
+        - { id: "B10.5", name: "Protocol Discovery & Catalog Features", status: "Completed" }
+        - { id: "B10.6", name: "Protocol Versioning & Migration Tools", status: "Completed" }
+        - { id: "B10.7", name: "Real-World Integration Examples", status: "Completed" }
+        - { id: "B10.8", name: "Internal Developer Documentation", status: "Completed" }
+
+    - sprintId: "Sprint 11"
+      title: "Internal Refinement & Developer Experience"
+      focus: "Architecture separation, workflow adapters, CI/CD consolidation, catalog snapshots, protocol authoring UX, governance guardrails, security policies, observability, and test quality"
+      status: "Completed"
+      missions:
+        - { id: "B11.1", name: "Architecture Separation", status: "Completed" }
+        - { id: "B11.2", name: "Workflow Service Adapters", status: "Completed" }
+        - { id: "B11.3", name: "CI/CD Consolidation & Docker Fix", status: "Completed" }
+        - { id: "B11.4", name: "Catalog Snapshot & Workspaces", status: "Completed" }
+        - { id: "B11.5", name: "Protocol Authoring UX v2", status: "Completed" }
+        - { id: "B11.6", name: "Governance Versioning Guardrails", status: "Completed" }
+        - { id: "B11.7", name: "Security Policy Guardrails", status: "Completed" }
+        - { id: "B11.8", name: "Observability for Developers", status: "Completed" }
+        - { id: "B11.9", name: "Test Quality & Flake Reduction", status: "Completed" }
+
+    # Sprint 12 — closeout
+    - sprintId: "Sprint 12"
+      title: "ESM Migration & Foundation Stabilization"
+      focus: "Migrate to ESM with Babel+jest, add MCP E2E tests, harden CLI scaffolding, split CI fast/full jobs with perf budgets, and prove governance catalog workflows"
+      status: "Completed"
+      missions:
+        - { id: "M12.1", name: "ESM Migration and Test Hygiene", status: "Completed" }
+        - { id: "M12.2", name: "MCP Server E2E and Agent Runtime", status: "Completed" }
+        - { id: "M12.3", name: "CLI and Scaffolding Hardening", status: "Completed" }
+        - { id: "M12.4", name: "Performance and CI Guardrails", status: "Completed" }
+        - { id: "M12.5", name: "Governance and Catalog Proof", status: "Completed" }
+
+    # Sprint 13 — current orchestrated sprint
+    - sprintId: "Sprint 13"
+      title: "Draw.io Migration + Catalog Visualization UX"
+      focus: "Replace Mermaid with Draw.io; canonical catalog graph; CLI UX; scaling guardrails; auto-summary"
+      status: "Completed"
+      missions:
+        - id: "M13.1"
+          name: "Draw.io Exporter"
+          status: "Completed"
+          path: "missions/sprint-13/M13.1_Drawio-Exporter.yaml"
+          completed_at: "2025-10-14T15:17:23Z"
+          notes: "Implemented Draw.io exporter, CLI wiring, tests, and docs."
+        - id: "M13.2"
+          name: "Catalog Graph Builder"
+          status: "Completed"
+          path: "missions/sprint-13/M13.2_Catalog-Graph-Builder.yaml"
+          completed_at: "2025-10-14T15:43:42Z"
+          notes: "Canonical graph builder, CLI, schema validation, and tests delivered."
+        - id: "M13.3"
+          name: "CLI Commands & UX"
+          status: "Completed"
+          path: "missions/sprint-13/M13.3_CLI-Commands-and-UX.yaml"
+          completed_at: "2025-10-14T16:46:49Z"
+          notes: "Delivered catalog list/view/diagram commands with UX helpers, docs, and tests."
+        - id: "M13.4"
+          name: "Scaling Guardrails & Filters"
+          status: "Completed"
+          path: "missions/sprint-13/M13.4_Scaling-Guardrails-and-Filters.yaml"
+          completed_at: "2025-10-14T17:24:11Z"
+          notes: "Added draw.io guardrails, layer/split decomposition, CLI tips, tests, and docs."
+        - id: "M13.5"
+          name: "Sprint Summary Generator"
+          status: "Completed"
+          path: "missions/sprint-13/M13.5_Build_Summary-Report.yaml"
+          completed_at: "2025-10-14T17:52:27Z"
+          notes: "Automated sprint summary generator with CLI command, tests, and Markdown report."
+
+  # Mission Dependencies (cumulative)
+  missionDependencies:
+    # Sprint 8 dependencies
+    - { from: "B8.1", to: "B8.2", type: "Blocks" }
+    - { from: "B8.2", to: "B8.3", type: "Blocks" }
+    - { from: "B8.3", to: "B8.4", type: "Blocks" }
+    - { from: "B8.1", to: "B8.5", type: "Blocks" }
+    - { from: "B8.2", to: "B8.5", type: "Blocks" }
+    - { from: "B8.1", to: "B8.6", type: "Blocks" }
+    - { from: "B8.2", to: "B8.6", type: "Blocks" }
+    - { from: "B8.3", to: "B8.6", type: "Blocks" }
+    - { from: "B8.4", to: "B8.6", type: "Blocks" }
+    - { from: "B8.5", to: "B8.6", type: "Blocks" }
+    - { from: "B8.6", to: "B8.7", type: "Blocks" }
+    - { from: "B8.1", to: "B8.8", type: "Blocks" }
+    - { from: "B8.2", to: "B8.8", type: "Blocks" }
+    - { from: "B8.4", to: "B8.8", type: "Blocks" }
+    - { from: "B8.6", to: "B8.8", type: "Blocks" }
+    # Sprint 9 dependencies
+    - { from: "B9.1", to: "B9.2", type: "Blocks" }
+    - { from: "B9.1", to: "B9.3", type: "Blocks" }
+    - { from: "B9.2", to: "B9.3", type: "Blocks" }
+    # Sprint 10 dependencies
+    - { from: "B10.1", to: "B10.2", type: "Blocks" }
+    - { from: "B10.2", to: "B10.3", type: "Blocks" }
+    - { from: "B10.2", to: "B10.4", type: "Blocks" }
+    - { from: "B10.4", to: "B10.5", type: "Blocks" }
+    - { from: "B10.2", to: "B10.6", type: "Blocks" }
+    - { from: "B10.2", to: "B10.7", type: "Blocks" }
+    - { from: "B10.3", to: "B10.7", type: "Blocks" }
+    - { from: "B10.4", to: "B10.8", type: "Blocks" }
+    - { from: "B10.5", to: "B10.8", type: "Blocks" }
+    - { from: "B10.7", to: "B10.8", type: "Blocks" }
+    # Sprint 11 dependencies
+    - { from: "B11.1", to: "B11.5", type: "Blocks" }
+    - { from: "B11.2", to: "B11.8", type: "Blocks" }
+    - { from: "B11.3", to: "B11.7", type: "Blocks" }
+    - { from: "B11.4", to: "B11.9", type: "Blocks" }
+    - { from: "B11.5", to: "B11.6", type: "Blocks" }
+    - { from: "B11.6", to: "B11.9", type: "Blocks" }
+    - { from: "B11.7", to: "B11.8", type: "Blocks" }
+    - { from: "B11.8", to: "B11.9", type: "Blocks" }
+    # Sprint 12 dependencies
+    - { from: "M12.1", to: "M12.2", type: "Blocks" }
+    - { from: "M12.1", to: "M12.3", type: "Blocks" }
+    - { from: "M12.2", to: "M12.4", type: "Blocks" }
+    - { from: "M12.3", to: "M12.4", type: "Blocks" }
+    - { from: "M12.4", to: "M12.5", type: "Blocks" }
+    # Sprint 13 dependencies
+    - { from: "M13.2", to: "M13.1", type: "Blocks" }
+    - { from: "M13.2", to: "M13.3", type: "Blocks" }
+    - { from: "M13.1", to: "M13.4", type: "Relates" }
+    - { from: "M13.1", to: "M13.5", type: "Blocks" }
+    - { from: "M13.2", to: "M13.5", type: "Blocks" }
+    - { from: "M13.3", to: "M13.5", type: "Blocks" }
+    - { from: "M13.4", to: "M13.5", type: "Blocks" }
+
+  # Sprint Success Metrics (Sprint 12)
+  successMetrics:
+    - "Full test suite runs on ESM with Babel+jest configuration, zero 'require is not defined' errors"
+    - "MCP E2E test spawns server and exercises tool paths in <1s with structured assertions"
+    - "CLI scaffold dry-run/write paths work for api/data/event protocols with proper redaction"
+    - "CI split into fast (≤5min) and full jobs with perf budgets enforced (discovery_p95 <1000ms, mcp_p95 <3000ms)"
+    - "Governance tools (docs_mermaid, protocol_review) work end-to-end on curated example catalog"
+
+  # Sprint Success Metrics (Sprint 13)
+  successMetrics_13:
+    - "catalog build-graph emits valid, schema-checked JSON; filters reduce graph deterministically"
+    - "draw.io exporter generates native .drawio (mxGraphModel) that opens in browser; style map applied"
+    - "CLI: catalog list|view|generate-diagram with -o/--overwrite/--open; safe-by-default artifacts in /app/artifacts/diagrams/"
+    - "Guardrails warn at ≥250 nodes or ≥5MB (Warning) and ≥400 nodes or ≥10MB (Critical); layer/split reduce output size/latency"
+    - "Sprint summary generator writes /docs/sprints/sprint-13-summary.md using repository artifacts"

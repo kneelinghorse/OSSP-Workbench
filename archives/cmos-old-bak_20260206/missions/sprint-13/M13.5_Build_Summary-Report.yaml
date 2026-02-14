@@ -1,0 +1,79 @@
+name: "Build.Implementation.v1"
+version: "1.0.0"
+displayName: "Implementation Mission"
+
+missionId: "M13.5-20251024"
+objective: >
+  Build an automated sprint summary generator that compiles deliverable, test, and research data
+  from Sprint 13 into a complete Markdown report following the Sprint.Summary.v1 format.
+  The generator will query missions, tests, and metrics to produce an end-of-sprint summary
+  suitable for sprint review and next-sprint planning.
+
+context: |
+  Sprint 13 produces multiple build and research missions (M13.1–M13.4, R13.1–R13.4). This mission
+  automates creation of the final Sprint Summary report based on the canonical template
+  `/schemas/Sprint.Summary.v1.yaml`. It should collect completion status, metrics, and
+  key artifacts across `/missions/sprint-13/**`, `/app/docs/dev/`, and CI outputs, then
+  write a formatted report to `/docs/sprints/sprint-13-summary.md`.
+  
+  Reference materials:
+    - Template: `/schemas/Sprint.Summary.v1.yaml` :contentReference[oaicite:0]{index=0}
+    - Source data: `missions/backlog.yaml`, `AI_HANDOFF.md`, `PROJECT_CONTEXT.json`
+    - Mission definitions: `/missions/sprint-13/build/` + `/missions/sprint-13/research/`
+    - Test/coverage data: `/app/reports/coverage-summary.json`, `/app/reports/performance.json`
+
+successCriteria:
+  - "Running the summary generator after Sprint 13 automatically produces a Markdown report at `/docs/sprints/sprint-13-summary.md`."
+  - "Report includes all required template sections: Executive Summary, Missions Delivered, Decisions, Metrics, Coverage, and Planning Inputs."
+  - "Links and mission references resolve correctly to local repo paths."
+  - "Output validated against Sprint.Summary.v1 schema (structure and required fields)."
+
+deliverables:
+  - "/app/scripts/reports/sprint-summary-generator.ts       # Core generator script"
+  - "/app/schemas/Sprint.Summary.v1.yaml                    # Reference schema/template (already present)"
+  - "/app/tests/reports/sprint-summary-generator.test.ts    # Validates generated report completeness"
+  - "/docs/sprints/sprint-13-summary.md                     # Generated output (on successful run)"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Template Sprint.Summary.v1 defines consistent structure for executive summary, metrics, and planning inputs."
+      source: "/schemas/Sprint.Summary.v1.yaml" :contentReference[oaicite:1]{index=1}
+    - finding: "All missions for Sprint 13 produce machine-readable YAML outputs under /missions/sprint-13/build."
+      source: "/missions/sprint-13/build/"
+  implementationScope:
+    coreDeliverable: >
+      Implement a Node/TypeScript script that:
+        1) Loads `missions/backlog.yaml` to determine sprint missions and statuses.
+        2) Reads `/missions/sprint-13/build/*.yaml` for outcomes, deliverables, and research links.
+        3) Pulls metrics and coverage data from `/app/reports/`.
+        4) Parses `AI_HANDOFF.md` and `PROJECT_CONTEXT.json` for completion metadata.
+        5) Applies the template `/schemas/Sprint.Summary.v1.yaml` to render a Markdown report.
+        6) Validates required fields; warns if any data source missing.
+    outOfScope:
+      - "Generating visual charts (text-based summary only)."
+      - "Publishing or distributing reports outside the repo."
+  plan:
+    - id: data-aggregation
+      description: "Aggregate mission, test, and coverage data into normalized summary object."
+    - id: templating
+      description: "Render summary Markdown using Sprint.Summary.v1 template and variable interpolation."
+    - id: validation
+      description: "Schema validation step ensures report matches template; missing fields flagged with warnings."
+    - id: output
+      description: "Write final report to `/docs/sprints/sprint-13-summary.md`; print path to console."
+  validationProtocol:
+    - validator: "Local"
+      focus: "Generator runs end-of-sprint and outputs correctly formatted Markdown; report passes schema validation."
+    - validator: "CI-fast"
+      focus: "Report generation job executes successfully in CI after final mission completion."
+  handoffContext:
+    completed:
+      - "Sprint summary generator operational and validated with Sprint 13 data."
+    interfaces:
+      - "npm run generate:sprint-summary  # Executes generator"
+    assumptions:
+      - "Sprint 13 build and research missions complete with valid YAML in `/missions/sprint-13/`."
+      - "Test and coverage reports available under `/app/reports/`."
+    nextMission: "B14.1-Integration-Workbench"
+    blockers: []

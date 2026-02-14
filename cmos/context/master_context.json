@@ -1,0 +1,147 @@
+{
+  "project_identity": {
+    "name": "OSSP-Workbench",
+    "tagline": "Protocol-Driven Discovery",
+    "product_statement": "OSSP-Workbench converts API and event specifications into validated protocol manifests, generates production consumer code, and exports architecture visualizations — replacing manual service documentation with automated discovery.",
+    "target_users": "Platform engineering teams managing microservice ecosystems",
+    "repository": "OSSP-Workbench",
+    "license": "Proprietary"
+  },
+  "technical_foundation": {
+    "runtime": "Node.js >= 18",
+    "module_system": "ESM (type: module)",
+    "type_system": "JSDoc (no TypeScript)",
+    "test_runner": "Jest 29.7 with --experimental-vm-modules",
+    "package_manager": "npm",
+    "key_dependencies": [
+      "graphology (in-memory dependency graphs)",
+      "ajv (JSON Schema validation)",
+      "commander (CLI framework)",
+      "express (MCP server, viewer)",
+      "pg (PostgreSQL schema introspection)",
+      "xmlbuilder2 (DrawIO XML generation)",
+      "xxhash-addon (fast content hashing)",
+      "js-yaml (YAML parsing)"
+    ],
+    "architecture": "Three-tier protocol design: Protocol Definitions → Importers/Catalog → Generators/Visualization",
+    "protocol_tiers": {
+      "tier_1": ["api", "data", "event", "ui"],
+      "tier_2": ["agent"],
+      "tier_3": ["workflow", "ai-ml", "analytics", "config", "docs", "iam", "infra", "integration", "observability", "release", "semantic", "testing", "hardware"]
+    }
+  },
+  "decisions_made": [
+    {
+      "decision": "GO Decision: Codebase is viable. 927/966 tests pass (95.9%), 142/150 modules working (94.7%). Continue development.",
+      "sprint": "sprint-1",
+      "date": "2026-02-09",
+      "rationale": "M01-M04 evidence confirms coherent architecture with production-grade importers, catalog, and generators."
+    },
+    {
+      "decision": "Vision Shift: From 'Capabilities Proof' to 'Practical Utility'. System proved it can build 18 protocols; now must prove it replaces real documentation, testing, and architecture diagrams.",
+      "sprint": "sprint-1",
+      "date": "2026-02-09",
+      "rationale": "Extracted from archive RESEARCH_SYNTHESIS.md. Drives all future work."
+    },
+    {
+      "decision": "Protocol Suite Lock: 18 protocol types locked. No new types. Focus on depth over breadth. Tier 1 (api, data, event, ui) get full catalog support.",
+      "sprint": "sprint-1",
+      "date": "2026-02-09",
+      "rationale": "Architecture reality confirmed by M01-M02 findings."
+    },
+    {
+      "decision": "Local-First Architecture: All tools run offline in-process. No cloud dependencies. MCP server optional. Privacy-first, reproducible local execution.",
+      "sprint": "sprint-1",
+      "date": "2026-02-09",
+      "rationale": "Established early, confirmed through Sprint 12. Active constraint."
+    },
+    {
+      "decision": "PII-First Security: Three-layer protection (pattern+entropy+redaction hooks). 99% secret detection. Non-negotiable for enterprise adoption.",
+      "sprint": "sprint-1",
+      "date": "2026-02-09",
+      "rationale": "Implemented Sprint 4-5. 31 tests, 11 credential patterns."
+    },
+    {
+      "decision": "Governance-as-Code: Event patterns (DLQ, ordering, fanout, evolution) drive compliance warnings in generated consumer code.",
+      "sprint": "sprint-1",
+      "date": "2026-02-09",
+      "rationale": "Sprint 4. 20+ consumers generated with governance annotations."
+    },
+    {
+      "decision": "CMOS-First Workflow: CMOS DB is the source of truth for missions, sessions, and decisions. SESSIONS.jsonl is supplementary.",
+      "sprint": "sprint-1",
+      "date": "2026-02-09",
+      "rationale": "Reconciliation revealed drift between file-based and DB-based tracking."
+    },
+    {
+      "decision": "Scope Cuts Locked: No Tier 3 catalog integration, no hardware generator, no web viewer, no distributed concurrency, no OpenAPI 2.0, no agent-vitals Python deps, no A2A handshake verification, no 18-protocol expansion.",
+      "sprint": "sprint-1",
+      "date": "2026-02-09",
+      "rationale": "Focus on 6 protocols with depth instead of 18 with breadth."
+    }
+  ],
+  "constraints": [
+    {
+      "constraint": "ESM/CJS Module Boundary: RESOLVED in Sprint 2. Project now uses ESM throughout.",
+      "impact": "Was 50% of test suite failures; now resolved — 100% suite pass rate",
+      "mitigation": "Resolved: Sprint 2 s2-m02",
+      "status": "resolved"
+    },
+    {
+      "constraint": "Catalog Type Bottleneck: RESOLVED in Sprint 2. Catalog now supports 6 protocol types (api, data, event, ui, workflow, agent).",
+      "impact": "Was blocking Tier 2 protocols; now resolved",
+      "mitigation": "Resolved: Sprint 2 s2-m03",
+      "status": "resolved"
+    },
+    {
+      "constraint": "File-based persistence: No distributed locking. Single-process updates only.",
+      "impact": "Cannot run concurrent catalog writers",
+      "mitigation": "Accepted limitation — local-first architecture",
+      "status": "accepted"
+    }
+  ],
+  "quality_standards": {
+    "test_pass_rate_individual": "100% (2027/2027 as of Sprint 3)",
+    "test_pass_rate_suite_target": "100% (113/113 as of Sprint 3)",
+    "performance_targets": {
+      "openapi_parse": "<1s for 10k lines",
+      "asyncapi_parse": "<4s cold, <200ms warm",
+      "urn_catalog_lookup": "O(1), <1ms",
+      "consumer_generation": "<100ms",
+      "template_render": "<10ms",
+      "graph_operations": "<10ms for 1k nodes"
+    }
+  },
+  "sprint_completions": [
+    {
+      "sprint": "sprint-1",
+      "title": "Codebase Discovery & Viability Assessment",
+      "outcome": "5/5 missions completed. GO decision issued. Grounded roadmap and technical architecture produced.",
+      "date": "2026-02-09"
+    },
+    {
+      "sprint": "sprint-2",
+      "title": "Cleanup & Foundation Hardening",
+      "outcome": "4/4 missions completed. Legacy cleanup (-21K dead files), ESM/CJS fix (53.6% → 87.4% suite pass rate), catalog extended to 6 types (30 new tests).",
+      "date": "2026-02-11"
+    },
+    {
+      "sprint": "sprint-3",
+      "title": "Practical Utility & Quality Gate",
+      "outcome": "7/7 missions completed. 100% test pass rate (2027/2027), 100% suite pass rate (113/113). OpenAPI and AsyncAPI end-to-end demos working. README quickstart verified. PostgreSQL import path validated. All three import paths production-ready.",
+      "date": "2026-02-12"
+    }
+  ],
+  "historical_context": {
+    "total_sprints_completed": 14,
+    "total_build_missions": "100+",
+    "key_milestones": [
+      "Sprint 1-3: Foundation (importers, CLI, workflow)",
+      "Sprint 4: AsyncAPI + event governance",
+      "Sprint 5: Production readiness (catalog, redaction, scaffolding, CI)",
+      "Sprint 7-8: Parser extensions, agent registration, runtime integration",
+      "Sprint 9-10: Performance optimization, protocol suite completion",
+      "Sprint 11-12: Architecture refinement, ESM migration"
+    ]
+  }
+}

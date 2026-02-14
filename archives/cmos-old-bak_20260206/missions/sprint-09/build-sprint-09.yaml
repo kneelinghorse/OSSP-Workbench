@@ -1,0 +1,154 @@
+# Sprint 09 – Build Missions: Performance, Validation & Integration Enablement
+# Objective: Harden the MCP server for sustained real-world use and deliver the
+# first cross-protocol validation engine while improving developer workflow.
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-09-b1-performance
+  name: Performance Optimization & Hardening
+  domain: build.mcp-server
+  priority: critical
+  estimatedHours: 10
+  dependencies: []
+spec:
+  objective: >
+    Profile and optimize the MCP server and runtime paths for sustained internal load,
+    adding observability and production packaging sufficient for continuous operation.
+  context: >
+    Sprint 08 delivered functional runtime execution; now the focus is throughput,
+    latency, and insight.  This is capability-oriented hardening, not product polish.
+  technicalRequirements:
+    - Profile hotspots in URN Resolver, ProtocolGraph, A2A → MCP request paths.
+    - Optimize caching, batch I/O, streaming JSON, concurrency.
+    - Add lightweight observability: latency histograms, retry counts, cache hits,
+      correlation IDs propagated through logs.
+    - Create a Dockerfile and an operator runbook documenting env vars and runtime limits.
+    - CI job must surface summary metrics in its output.
+  implementation:
+    inputSources:
+      - Existing MCP server benchmark logs.
+      - Profiling tools (Node prof, 0x, clinic.js).
+    coreComponents:
+      - services/mcp-server/**
+      - services/registry/**
+      - packages/runtime/**
+    keyAlgorithms:
+      - Cache pre-warm and memoization.
+      - Streamed JSON serialization for large payloads.
+      - Promise-pool concurrency tuning.
+  acceptanceCriteria:
+    - Discovery p95 < 1 s; MCP p95 < 3 s.
+    - Steady-state heap < 100 MB under 10-min soak.
+    - CI pipeline completes < 5 min.
+    - Metrics visible in logs and summarized in CI output.
+  deliverables:
+    - Optimized MCP server build.
+    - `/metrics` JSON endpoint or equivalent log output.
+    - Dockerfile + operator runbook.
+  constraints:
+    - No external APM/Prometheus; use internal logging only.
+    - Optimization must not reduce correctness or validation accuracy.
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-09-b2-validation
+  name: Cross-Protocol Validation Engine
+  domain: build.validation
+  priority: critical
+  estimatedHours: 10
+  dependencies:
+    - sprint-09-b1-performance
+spec:
+  objective: >
+    Build the first full cross-protocol validation engine and remove stub logic from
+    the MCP server, enabling ecosystem-wide integrity checks.
+  context: >
+    With the MCP server hardened, the next capability is automatic validation of all
+    protocol relationships—schema links, dependency chains, cycles, and governance rules.
+  technicalRequirements:
+    - Remove remaining stub messaging from MCP server.
+    - Extend discovery with full OpenAPI 3.x parsing.
+    - Validation Engine: load → resolve → analyze → report.
+    - Governance Rules v0.1: missing schema, cyclic dep, duplicate URN.
+    - CLI command `ossp validate --ecosystem` outputs JSON + summary report.
+  implementation:
+    inputSources:
+      - Protocol manifests from MCP server catalog.
+      - Existing graph + schema utilities.
+    coreComponents:
+      - packages/validation/**
+      - services/mcp-server/**
+    keyAlgorithms:
+      - Graph traversal and dependency map.
+      - Rule evaluation and scoring.
+      - JSON report generator.
+  acceptanceCriteria:
+    - Validates ≥ 100 protocols in < 1 s (local run).
+    - MCP server exposes complete API docs via discovery.
+    - `validate --ecosystem` produces structured report and exit code != 0 on failure.
+  deliverables:
+    - Validation engine core module + CLI.
+    - Updated MCP server API documentation.
+    - Sample validation report artifact.
+  constraints:
+    - Single-threaded implementation acceptable for now.
+    - Ruleset file-based and reloadable without restart.
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-09-b3-integration
+  name: Enhanced Tooling & Integration Examples
+  domain: build.integration
+  priority: high
+  estimatedHours: 8
+  dependencies:
+    - sprint-09-b1-performance
+    - sprint-09-b2-validation
+spec:
+  objective: >
+    Demonstrate real-world capability through one micro-service integration pattern
+    using live MCP tools and improve the developer onboarding workflow.
+  context: >
+    Once performance + validation are solid, the next bottleneck is developer comprehension.
+    This mission shows how the system works in practice and reduces time-to-first result.
+  technicalRequirements:
+    - Create a microservice-style integration pattern using existing MCP tools.
+    - Improve MCP server error messages and validation feedback.
+    - Build interactive tutorial / CLI guide for protocol discovery.
+    - End-to-end workflow from startup → first protocol validated < 2 min.
+  implementation:
+    inputSources:
+      - Hardened MCP server from B9.1.
+      - Validation engine from B9.2.
+    coreComponents:
+      - examples/microservices-pattern/**
+      - packages/cli/**
+      - docs/quickstart.md
+    keyAlgorithms:
+      - Template project scaffold for multi-tool composition.
+      - Interactive CLI wizard (ossp quickstart).
+  acceptanceCriteria:
+    - Integration pattern runs locally and passes validation.
+    - Developer time to first discovery < 2 min.
+    - CLI wizard completes without manual editing.
+  deliverables:
+    - `examples/microservices-pattern` template.
+    - Improved error messages + CLI wizard.
+    - `docs/quickstart.md` onboarding guide.
+  constraints:
+    - Text-based CLI/tutorial only; no UI.
+    - Focus on real execution over presentation.
+
+---
+notes:
+  canonical: true
+  description: >
+    Sprint 09 strengthens the MCP server’s performance and observability,
+    introduces the Cross-Protocol Validation Engine, and provides a realistic
+    integration pattern to demonstrate system capability end-to-end.

@@ -1,0 +1,99 @@
+# Mission File: B8.3_Agent_Capability_Manifest.yaml
+
+missionId: "B8.3-20250106-001"
+
+objective: "Implement Agent Capability Manifest (ACM) generator and /.well-known endpoint for agent discovery with URN resolution and capability validation."
+
+context: |
+  This is mission B8.3 of Sprint 8, focusing on agent discovery infrastructure.
+  Agents need to publish their capabilities via ACM manifests and expose them
+  through standard /.well-known endpoints for discovery by other agents.
+
+successCriteria:
+  - "ACM Generator: createACM(agentConfig) returns valid ACM manifest"
+  - "ACM Validation: validateACM(manifest) with schema validation and URN resolution"
+  - "Well-Known Endpoint: /.well-known/agent-capabilities returns ACM manifest"
+  - "URN Resolution: resolveAgentUrn(urn) returns agent metadata and capabilities"
+  - "Capability Discovery: discoverCapabilities(domain) returns available agents"
+  - "Integration: Works with existing MCP client and A2A client"
+  - "Tests: ACM generation, validation, and discovery endpoints"
+  - "Tests: URN resolution with caching and error handling"
+  - "Tests: Well-known endpoint with proper HTTP headers and CORS"
+  - "The completionProtocol checklist is fully executed."
+
+deliverables:
+  - "File: app/runtime/acm-generator.js"
+  - "File: app/runtime/urn-resolver.js"
+  - "File: app/runtime/well-known-server.js"
+  - "Tests: app/tests/runtime/acm-generator.test.js"
+  - "Tests: app/tests/runtime/urn-resolver.test.js"
+  - "Tests: app/tests/runtime/well-known-server.test.js"
+  - "Docs: Updated runtime README section (ACM usage, discovery patterns)"
+  - "Example: Agent discovery demo script"
+
+domainFields:
+  type: "Build.Runtime.v1"
+
+  researchFoundation:
+    - finding: "Agents need standardized capability manifests for discovery"
+      sourceMission: "Sprint 8 planning"
+    - finding: "Well-known endpoints are standard for service discovery"
+      sourceMission: "RFC 8615 research"
+
+  implementationScope:
+    coreDeliverable: "ACM generator, URN resolver, and well-known endpoint server"
+    outOfScope:
+      - "Agent registry persistence (B8.4)"
+      - "Advanced discovery protocols (B8.6)"
+      - "Agent authentication and authorization"
+
+  validationProtocol:
+    - validator: "Unit Tests"
+      focus: "ACM generation, validation, URN resolution, well-known endpoint"
+    - validator: "Integration Tests"
+      focus: "End-to-end agent discovery workflow"
+
+  handoffContext:
+    completed:
+      - "A2A HTTP client with auth, delegation, retries, and timeouts"
+      - "MCP client with connection lifecycle, tool execution, and error handling"
+    interfaces:
+      - "ACM Generator: createACM(agentConfig) -> ACM manifest"
+      - "URN Resolver: resolveAgentUrn(urn) -> agent metadata"
+      - "Well-Known Server: /.well-known/agent-capabilities endpoint"
+      - "Capability Discovery: discoverCapabilities(domain) -> agent list"
+    assumptions:
+      - "ACM manifests follow standard schema"
+      - "Well-known endpoints use HTTP/HTTPS"
+      - "URN format: urn:agent:domain:name[@version]"
+    nextMission: "B8.4_URN_Registry_Agent_Discovery: Implement URN registry and agent discovery service"
+    blockers: []
+
+  completionProtocol:
+    description: "When this mission is complete, update the following files"
+    required:
+      - file: "missions/backlog.yaml"
+        action: "Update B8.3 mission status to 'Completed', set B8.4 mission to 'Current'"
+        
+      - file: "missions/current.yaml"
+        action: "Replace entire file with next mission (B8.4) content"
+        
+      - file: "PROJECT_CONTEXT.json"
+        action: |
+          Update:
+          - working_memory.session_count (increment)
+          - domains.runtime_integration.missions.B8.3.status = "complete"
+          - domains.runtime_integration.missions.B8.4.status = "in_progress"
+          - mission_planning.current_mission (update to B8.4)
+          - current_sprint.active_mission (update to B8.4)
+          - current_sprint.completed_missions (add B8.3)
+      
+    optional:
+      - file: "SESSIONS.jsonl"
+        action: "Append session log entry with mission completion data"
+
+    verification:
+      - "All deliverable files created and tests passing"
+      - "All required files updated"
+      - "Next mission (B8.4) is ready to execute"
+      - "No placeholder text remains in updated files"

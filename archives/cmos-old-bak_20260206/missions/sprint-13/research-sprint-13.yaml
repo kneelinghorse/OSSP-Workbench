@@ -1,0 +1,162 @@
+# pack.yaml - Metadata for the "Research" Domain Pack
+name: "Build.Research.v1"
+version: "1.0.0"
+displayName: "Research Mission"
+description: "Targeted research missions supporting Sprint 13 (Draw.io migration + Catalog UX)."
+author: "OSSP AGI"
+schema: "./schemas/Research.v1.json"
+
+---
+
+# Mission File: R13.1_Drawio_Export_Spec.yaml
+missionId: "R13.1-20251013"
+objective: >
+  Identify Draw.io’s minimal JSON structure for graph export and map OSSP-AGI protocol entities
+  (protocols, relationships, categories) to Draw.io shapes, edges, and styles.
+
+context: |
+  Sprint 13 will replace Mermaid with Draw.io as the visualization target. We must understand how
+  to programmatically produce Draw.io diagrams from catalog data.  This research should determine
+  the smallest viable JSON model, confirm compatibility with the diagrams.net web editor, and
+  propose a mapping between protocol concepts and diagram primitives.
+
+successCriteria:
+  - "Working prototype script exports a Draw.io JSON that opens in diagrams.net."
+  - "Documented mapping: protocol → shape, relationship → edge, category → style/color."
+  - "Schema description of required fields (cells, geometry, style) recorded in /research report."
+
+deliverables:
+  - "/app/research/drawio/export-spec.md"
+  - "/app/scripts/research/drawio-export-prototype.js"
+  - "Example file: /app/research/drawio/sample-protocol-graph.drawio.json"
+
+domainFields:
+  type: "Build.Research.v1"
+  researchQuestions:
+    - "What fields are required for Draw.io JSON to render a valid diagram (mxGraphModel or diagrams.net JSON)?"
+    - "Is JSON import stable across browser and desktop editors?"
+    - "Can we bypass XML entirely?"
+    - "How should protocol type, URN, and relationships map to shapes and edges?"
+  methods:
+    - "Inspect Draw.io JSON generated via manual export."
+    - "Reverse-engineer minimal required fields by pruning."
+    - "Build Node script that serializes mock node/edge graph to Draw.io JSON."
+  expectedArtifacts:
+    - "Working .drawio.json file opened successfully in diagrams.net."
+    - "Mapping table of protocol → visual style."
+  nextMission: "R13.2-20251013"
+  blockers: []
+
+---
+
+# Mission File: R13.2_Catalog_Graph_Model.yaml
+missionId: "R13.2-20251013"
+objective: >
+  Define a standard node/edge schema for the OSSP-AGI protocol catalog visualization.
+  Determine how manifests and relationships should be represented for export to Draw.io.
+
+context: |
+  To visualize the catalog we need a consistent graph model before any Draw.io export.
+  This schema will unify node attributes (id, type, title, urn, path) and edge attributes
+  (source, target, relationship, label).  It should support filtering and aggregation by domain.
+
+successCriteria:
+  - "JSON Schema describing node/edge fields stored in /app/research/catalog/graph-schema.json."
+  - "Mock catalog of ~10-15 manifests serialized in that schema opens via R13.1 prototype."
+  - "Performance estimate (node/edge limits for smooth rendering) recorded."
+
+deliverables:
+  - "/app/research/catalog/graph-schema.json"
+  - "/app/research/catalog/mock-catalog.json"
+  - "/app/research/catalog/catalog-graph-report.md"
+
+domainFields:
+  type: "Build.Research.v1"
+  researchQuestions:
+    - "What minimal fields are required for each node and edge?"
+    - "Should relationships be directional?"
+    - "How to tag protocol domains (API, Workflow, Agent) for color-coding?"
+    - "How large can the graph get before Draw.io UI slows (>100 nodes)?"
+  methods:
+    - "Extract sample data from current catalog.json."
+    - "Normalize into node/edge pairs."
+    - "Validate rendering through Draw.io prototype."
+  expectedArtifacts:
+    - "Schema + sample catalog working with Draw.io export."
+  nextMission: "R13.3-20251013"
+  blockers: []
+
+---
+
+# Mission File: R13.3_CLI_and_UX_Flow.yaml
+missionId: "R13.3-20251013"
+objective: >
+  Determine the most natural CLI and UX flow for generating and viewing Draw.io exports
+  and browsing the protocol catalog (commands, output paths, naming conventions).
+
+context: |
+  The Draw.io visualization and catalog features will be surfaced through the CLI.
+  This research explores command syntax, logging style, and file conventions that align
+  with developer expectations (similar to Postman, Graphviz, or Terraform graph commands).
+
+successCriteria:
+  - "One-page UX proposal (/research/cli/cli-ux-proposal.md) describing commands and outputs."
+  - "Mock CLI transcript demonstrating export and open flows."
+  - "Decision on default artifact path (/app/artifacts/diagrams/catalog-*.drawio.json)."
+
+deliverables:
+  - "/app/research/cli/cli-ux-proposal.md"
+  - "/app/research/cli/mock-cli-transcript.txt"
+
+domainFields:
+  type: "Build.Research.v1"
+  researchQuestions:
+    - "Should visualization commands live under 'protocol:docs' or 'catalog:view'?"
+    - "Should the CLI auto-open Draw.io in browser or only save artifact?"
+    - "What logging style provides best developer clarity (spinner, file → path, success message)?"
+    - "How to manage output filenames and overwrite rules?"
+  methods:
+    - "Survey common CLIs (Graphviz, Postman CLI, Terraform)."
+    - "Run local dry-run prototypes with current CLI architecture."
+    - "Collect dev feedback on readability of output logs."
+  expectedArtifacts:
+    - "CLI design doc and transcript showing target UX."
+  nextMission: "R13.4-20251013"
+  blockers: []
+
+---
+
+# Mission File: R13.4_Performance_and_Scaling_Check.yaml
+missionId: "R13.4-20251013"
+objective: >
+  Benchmark Draw.io rendering and file-size limits for large catalogs.
+  Determine practical thresholds for node/edge counts and recommend pagination or filtering strategies.
+
+context: |
+  Early scaling data will prevent UX stalls later. This mission measures how Draw.io handles
+  increasing graph sizes exported from our catalog and identifies mitigation strategies if needed.
+
+successCriteria:
+  - "Empirical timing data for 50, 100, 250-node graphs recorded in /research/perf/drawio-scaling.md."
+  - "Recommended node/edge thresholds documented (warning levels for catalog viewer)."
+  - "Prototype script /app/scripts/research/drawio-scaling.js producing these metrics."
+
+deliverables:
+  - "/app/research/perf/drawio-scaling.md"
+  - "/app/scripts/research/drawio-scaling.js"
+  - "/app/research/perf/drawio-scaling-results.json"
+
+domainFields:
+  type: "Build.Research.v1"
+  researchQuestions:
+    - "At what graph size does Draw.io slow noticeably in browser?"
+    - "Does JSON vs XML import affect speed or memory?"
+    - "What optimizations (layering, group collapse) are practical?"
+  methods:
+    - "Generate synthetic catalogs of increasing size (node × edge)."
+    - "Import into diagrams.net; record render times."
+    - "Compare JSON vs XML versions."
+  expectedArtifacts:
+    - "Scaling data and performance recommendations."
+  nextMission: ""
+  blockers: []

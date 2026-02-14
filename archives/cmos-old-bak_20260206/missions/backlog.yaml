@@ -1,0 +1,152 @@
+# backlog.yaml - Sprint Plan Metadata
+name: "Planning.SprintPlan.v1"
+version: "1.0.0"
+displayName: "Sprint Plan Orchestrator"
+description: "Master backlog tracking all sprints, missions, and dependencies"
+author: "OSSP-AGI Team"
+
+---
+
+# Mission File: project-main-backlog.yaml
+
+missionId: "SP-MAIN-001"
+
+objective: "To successfully track, manage, and complete all planned development sprints from foundation through final delivery."
+
+context: |
+  This mission file represents the master backlog and sprint plan for the OSSP-AGI project.
+  It provides a single source of truth for what has been completed, what is in progress, and what is planned.
+  This structured format allows for automated status tracking and dependency management.
+
+successCriteria:
+  - "All missions within the current sprint are moved through 'Current' to 'Completed' status."
+  - "Sprint transitions are properly documented with learnings captured."
+
+deliverables:
+  - "A fully updated version of this mission file with accurate sprint and mission status."
+
+domainFields:
+  type: "Planning.SprintPlan.v1"
+
+  sprints:
+    # Sprint 12 — historical context
+    - sprintId: "Sprint 12"
+      title: "ESM Migration & Foundation Stabilization"
+      focus: "Migrate to ESM with Babel+jest, add MCP E2E tests, harden CLI scaffolding, split CI fast/full jobs with perf budgets, and prove governance catalog workflows"
+      status: "Completed"
+      missions:
+        - { id: "M12.1", name: "ESM Migration and Test Hygiene", status: "Completed" }
+        - { id: "M12.2", name: "MCP Server E2E and Agent Runtime", status: "Completed" }
+        - { id: "M12.3", name: "CLI and Scaffolding Hardening", status: "Completed" }
+        - { id: "M12.4", name: "Performance and CI Guardrails", status: "Completed" }
+        - { id: "M12.5", name: "Governance and Catalog Proof", status: "Completed" }
+
+    # Sprint 13 — closed
+    - sprintId: "Sprint 13"
+      title: "Draw.io Migration + Catalog Visualization UX"
+      focus: "Replace Mermaid with Draw.io; canonical catalog graph; CLI UX; scaling guardrails; auto-summary"
+      status: "Completed"
+      missions:
+        - id: "M13.1"
+          name: "Draw.io Exporter"
+          status: "Completed"
+          path: "missions/sprint-13/M13.1_Drawio-Exporter.yaml"
+          completed_at: "2025-10-14T15:17:23Z"
+          notes: "Implemented Draw.io exporter, CLI wiring, tests, and docs."
+        - id: "M13.2"
+          name: "Catalog Graph Builder"
+          status: "Completed"
+          path: "missions/sprint-13/M13.2_Catalog-Graph-Builder.yaml"
+          completed_at: "2025-10-14T15:43:42Z"
+          notes: "Canonical graph builder, CLI, schema validation, and tests delivered."
+        - id: "M13.3"
+          name: "CLI Commands & UX"
+          status: "Completed"
+          path: "missions/sprint-13/M13.3_CLI-Commands-and-UX.yaml"
+          completed_at: "2025-10-14T16:46:49Z"
+          notes: "Delivered catalog list/view/diagram commands with UX helpers, docs, and tests."
+        - id: "M13.4"
+          name: "Scaling Guardrails & Filters"
+          status: "Completed"
+          path: "missions/sprint-13/M13.4_Scaling-Guardrails-and-Filters.yaml"
+          completed_at: "2025-10-14T17:24:11Z"
+          notes: "Added draw.io guardrails, layer/split decomposition, CLI tips, tests, and docs."
+        - id: "M13.5"
+          name: "Sprint Summary Generator"
+          status: "Completed"
+          path: "missions/sprint-13/M13.5_Sprint-Summary-Generator.yaml"
+          completed_at: "2025-10-14T17:52:27Z"
+          notes: "Automated sprint summary generator with CLI command, tests, and Markdown report."
+
+    # Sprint 14 — current
+    - sprintId: "Sprint 14"
+      title: "Integration Workbench & Practical Demonstrations"
+      focus: "Connect protocol suite into real integration scenarios; validate performance, cross-platform behavior, and theming."
+      status: "Current"
+      missions:
+        - id: "B14.1"
+          name: "Integration Workbench Prototype"
+          status: "Completed"
+          path: "missions/sprint-14/B14.1_Integration-Workbench-Prototype.yaml"
+          completed_at: "2025-10-15T02:18:00Z"
+          notes: "Delivered runnable workbench runtime, CLI commands, benchmark script, docs, and perf reports."
+        - id: "B14.2"
+          name: "Cytoscape-Compatible Export & Viewer"
+          status: "Completed"
+          path: "missions/sprint-14/B14.2_Cytoscape-Compatible-Export-Viewer.yaml"
+          completed_at: "2025-10-15T02:43:23Z"
+          notes: "Shipped Cytoscape exporter, viewer bundle, CLI format switch, docs, and tests."
+        - id: "B14.3"
+          name: "External Style Config & Theme Service"
+          status: "Completed"
+          path: "missions/sprint-14/B14.3_External-Style-Config-and-Theme-Service.yaml"
+          completed_at: "2025-10-15T03:19:45Z"
+          notes: "Delivered shared theme schema, light/dark manifests, serializer, CLI switch command, and tests; Draw.io/Cytoscape exporters consume active theme."
+        - id: "B14.4"
+          name: "Cross-Platform CLI Validation"
+          status: "Completed"
+          path: "missions/sprint-14/B14.4_Cross-Platform-CLI-Validation.yaml"
+          completed_at: "2025-10-15T03:34:34Z"
+          notes: "CLI --open guardian delivered with docs, tests, and cross-platform integration."
+        - id: "B14.5"
+          name: "Integration Examples & Developer Docs"
+          status: "Completed"
+          path: "missions/sprint-14/B14.5_Integration-Examples-and-Docs.yaml"
+          completed_at: "2025-10-15T03:42:38Z"
+          notes: "Delivered integration workflow demo with docs, tests, and diagram artifacts under app/."
+
+  # Mission Dependencies (rolling window: Sprint 12–14)
+  missionDependencies:
+    # Sprint 12 → 13 linkage
+    - { from: "M12.5", to: "M13.1", type: "Relates" }
+    - { from: "M12.5", to: "M13.2", type: "Relates" }
+    # Sprint 13 dependencies
+    - { from: "M13.2", to: "M13.1", type: "Blocks" }
+    - { from: "M13.2", to: "M13.3", type: "Blocks" }
+    - { from: "M13.1", to: "M13.4", type: "Relates" }
+    - { from: "M13.1", to: "M13.5", type: "Blocks" }
+    - { from: "M13.2", to: "M13.5", type: "Blocks" }
+    - { from: "M13.3", to: "M13.5", type: "Blocks" }
+    - { from: "M13.4", to: "M13.5", type: "Blocks" }
+    # Sprint 14 dependencies
+    - { from: "B14.1", to: "B14.2", type: "Blocks" }
+    - { from: "B14.1", to: "B14.3", type: "Blocks" }
+    - { from: "B14.2", to: "B14.4", type: "Relates" }
+    - { from: "B14.3", to: "B14.4", type: "Relates" }
+    - { from: "B14.4", to: "B14.5", type: "Blocks" }
+
+  # Sprint Success Metrics (Sprint 13)
+  successMetrics_13:
+    - "catalog build-graph emits valid, schema-checked JSON; filters reduce graph deterministically"
+    - "draw.io exporter generates native .drawio (mxGraphModel) that opens in browser; style map applied"
+    - "CLI: catalog list|view|generate-diagram with -o/--overwrite/--open; safe-by-default artifacts in /app/artifacts/diagrams/"
+    - "Guardrails warn at ≥250 nodes or ≥5MB (Warning) and ≥400 nodes or ≥10MB (Critical); layer/split reduce output size/latency"
+    - "Sprint summary generator writes /docs/sprints/sprint-13-summary.md using repository artifacts"
+
+  # Sprint Success Metrics (Sprint 14)
+  successMetrics_14:
+    - "Integration Workbench orchestrates multi-protocol workflows (API → Event → Data) with p95 ≤ 2s @ ≤5 agents"
+    - "Cytoscape.js viewer enables exploration of catalogs >250 nodes with stable 60fps interaction"
+    - "Theme-style-schema.json externalized; Draw.io and Cytoscape themes in parity (light/dark)"
+    - "CLI open-wrapper verified across macOS, Windows, and Linux; CI-safe by default"
+    - "Example integration and developer docs published and validated end-to-end"

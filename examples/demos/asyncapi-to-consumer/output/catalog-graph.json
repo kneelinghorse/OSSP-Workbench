@@ -1,0 +1,43 @@
+{
+  "id": "catalog-graph",
+  "name": "AsyncAPI Consumer Demo Catalog Graph",
+  "description": "AsyncAPI event manifest registration used for consumer generation demo.",
+  "version": "1.0.0",
+  "generatedAt": "2026-02-12T05:01:15.969Z",
+  "nodes": [
+    {
+      "id": "2844ac2a06f63adb",
+      "label": "customer.events.profile-updated",
+      "type": "event",
+      "domain": "event",
+      "urn": "urn:events:customer:events:profile-updated",
+      "path": "manifests/event-manifest.json",
+      "metadata": {
+        "version": "1.0.0",
+        "kind": "event",
+        "domain": "event",
+        "status": "draft"
+      }
+    }
+  ],
+  "edges": [],
+  "metadata": {
+    "workspace": "/Users/systemsystems/portfolio/OSSP-Workbench/examples/demos/asyncapi-to-consumer/output",
+    "inputs": [
+      "manifests/event-manifest.json"
+    ],
+    "counts": {
+      "manifests": 1,
+      "nodes": 1,
+      "edges": 0
+    },
+    "filters": null,
+    "stats": {
+      "discarded": {
+        "nodes": 0
+      },
+      "externalNodes": 0,
+      "relationshipsProcessed": 0
+    }
+  }
+}

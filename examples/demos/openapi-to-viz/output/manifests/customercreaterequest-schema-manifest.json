@@ -1,0 +1,47 @@
+{
+  "urn": "urn:proto:data:commerce-orders-api/schema/customercreaterequest@1.2.0",
+  "metadata": {
+    "kind": "data",
+    "name": "CustomerCreateRequest Schema",
+    "version": "1.2.0",
+    "status": "derived",
+    "description": "Schema extracted from OpenAPI component: CustomerCreateRequest",
+    "tags": [
+      "openapi",
+      "schema",
+      "demo"
+    ]
+  },
+  "schema": {
+    "name": "CustomerCreateRequest",
+    "source": "openapi-component",
+    "ownerServiceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+    "definition": {
+      "type": "object",
+      "required": [
+        "email",
+        "name"
+      ],
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "name": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/components/schemas/Address"
+        }
+      }
+    }
+  },
+  "relationships": {
+    "dependencies": [
+      "urn:proto:data:commerce-orders-api/schema/address@1.2.0"
+    ],
+    "consumers": [
+      "urn:proto:api:commerce-orders-api/service@1.2.0"
+    ]
+  }
+}

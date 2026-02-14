@@ -1,0 +1,15 @@
+{
+  "index": [],
+  "domainIndex": [],
+  "capabilityIndex": [],
+  "stats": {
+    "totalAgents": 0,
+    "domains": 0,
+    "capabilities": 0,
+    "oldestAgent": null,
+    "newestAgent": null,
+    "domainStats": {},
+    "capabilityStats": {}
+  },
+  "lastSaved": "2026-02-12T04:16:59.707Z"
+}

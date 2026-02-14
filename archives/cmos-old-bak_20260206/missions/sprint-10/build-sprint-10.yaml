@@ -1,0 +1,317 @@
+# Sprint 10 – Build Missions: Protocol Suite Completion & Internal Tooling
+# Objective: Close functional gaps, deepen validation, improve developer tools,
+# and provide comprehensive internal examples and documentation.
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-10-b1-fixes
+  name: Workflow Fixes & Validation Gaps
+  domain: build.core
+  priority: critical
+  estimatedHours: 8
+  dependencies: []
+spec:
+  objective: >
+    Resolve the workflow example path-resolution bug and address residual
+    cross-protocol validation gaps revealed in Sprint 9.
+  context: >
+    Core runtime and validation are operational but contain inconsistencies in
+    workflow path mapping and missing schema references between protocols.
+  technicalRequirements:
+    - Diagnose and correct workflow path resolution in examples and runtime.
+    - Extend validation rules for unresolved schema links and orphan URNs.
+    - Add regression tests ensuring workflow resolution and validation integrity.
+  implementation:
+    inputSources:
+      - Workflow engine logs and failing validation reports.
+    coreComponents:
+      - packages/workflow/**
+      - packages/validation/**
+    keyAlgorithms:
+      - Graph-based dependency traversal and path correction.
+  acceptanceCriteria:
+    - All workflow examples execute successfully end-to-end.
+    - Validation engine reports zero unresolved or orphaned schemas.
+  deliverables:
+    - Fixed workflow examples.
+    - Updated validation rule set and tests.
+  constraints:
+    - Maintain backward-compatibility with existing manifests.
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-10-b2-protocol-completion
+  name: Extended Protocol Generators & Validators
+  domain: build.protocols
+  priority: critical
+  estimatedHours: 10
+  dependencies:
+    - sprint-10-b1-fixes
+spec:
+  objective: >
+    Complete missing generators and validators for all extended protocols to
+    achieve a fully functional protocol suite.
+  context: >
+    Several extended protocols (e.g., IAM, Analytics, Integration) lack generators
+    and validators, preventing consistent manifest creation and cross-protocol use.
+  technicalRequirements:
+    - Implement manifest generators and validators for remaining extended protocols.
+    - Ensure each protocol supports discovery via MCP.
+    - Integrate with validation engine and CLI for schema checking.
+  implementation:
+    inputSources:
+      - Existing protocol manifest patterns.
+    coreComponents:
+      - packages/protocols/**
+      - packages/validation/**
+    keyAlgorithms:
+      - Schema generation templates and JSON-Schema validation.
+  acceptanceCriteria:
+    - 18 / 18 protocols fully operational with generators and validators.
+    - CLI `ossp protocols list` shows no incomplete entries.
+  deliverables:
+    - Completed generators + validators for extended protocols.
+    - Updated CLI integration.
+  constraints:
+    - Follow existing protocol naming and manifest conventions.
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-10-b3-cross-rel
+  name: Deep Cross-Protocol Relationship Validation
+  domain: build.validation
+  priority: high
+  estimatedHours: 8
+  dependencies:
+    - sprint-10-b2-protocol-completion
+spec:
+  objective: >
+    Extend the Cross-Protocol Validation Engine to analyze and report complex relationships
+    such as bi-directional dependencies, version conflicts, and schema reuse patterns.
+  context: >
+    Initial validation focused on basic integrity. Now we need richer analysis to understand
+    how protocols interact and detect potential governance issues before runtime.
+  technicalRequirements:
+    - Add relationship graph scoring and visual dependency map export (JSON/GraphViz).
+    - Detect bidirectional links, schema duplication, and version drift.
+    - Integrate results into CLI `ossp validate --relationships`.
+  implementation:
+    inputSources:
+      - Validation engine outputs from Sprint 9.
+    coreComponents:
+      - packages/validation/**
+      - packages/cli/**
+    keyAlgorithms:
+      - Weighted graph analysis for relationship intensity.
+  acceptanceCriteria:
+    - Relationship validation completes for 100 protocols < 1 s.
+    - Reports include scores and visualization exports.
+  deliverables:
+    - Enhanced validation engine + CLI reporting.
+    - Example relationship map artifact.
+  constraints:
+    - Keep graph generation lightweight (no external DB dependencies).
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-10-b4-cli
+  name: CLI Enhancement & Error Handling
+  domain: build.cli
+  priority: high
+  estimatedHours: 8
+  dependencies:
+    - sprint-10-b2-protocol-completion
+spec:
+  objective: >
+    Improve the CLI for better usability, richer error feedback, and faster interactive
+    workflows for internal developers.
+  context: >
+    The current CLI is functional but verbose and not optimized for interactive use. 
+    Sprint 10 adds auto-completion, contextual errors, and catalog search capabilities.
+  technicalRequirements:
+    - Add command auto-completion and interactive prompts.
+    - Implement rich error descriptions with suggested fixes.
+    - Provide protocol catalog query (`ossp catalog search <term>`).
+  implementation:
+    inputSources:
+      - CLI user feedback and internal usage logs.
+    coreComponents:
+      - packages/cli/**
+      - services/catalog/**
+    keyAlgorithms:
+      - Dynamic command registry and contextual error mapping.
+  acceptanceCriteria:
+    - CLI responds < 100 ms to common commands.
+    - Errors include recommended remediations for top 10 scenarios.
+  deliverables:
+    - Updated CLI binary + interactive help.
+    - Catalog search feature and error guide.
+  constraints:
+    - Remain text-based; no GUI extensions this sprint.
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-10-b5-catalog
+  name: Protocol Discovery & Catalog Features
+  domain: build.catalog
+  priority: medium
+  estimatedHours: 6
+  dependencies:
+    - sprint-10-b4-cli
+spec:
+  objective: >
+    Enhance the internal protocol catalog for searchability and cross-reference lookup across protocol types.
+  context: >
+    With the full protocol suite complete, an improved catalog allows developers to discover,
+    compare, and trace protocol implementations quickly.
+  technicalRequirements:
+    - Full-text search on protocol names, URNs, and keywords.
+    - Cross-reference viewer linking related protocols.
+    - CLI integration for `ossp catalog show <urn>`.
+  implementation:
+    inputSources:
+      - MCP server catalog endpoint.
+    coreComponents:
+      - services/catalog/**
+      - packages/cli/**
+    keyAlgorithms:
+      - Indexing and search weighting (TFIDF or simple keyword match).
+  acceptanceCriteria:
+    - Catalog search returns ranked results < 200 ms (local).
+    - Cross-reference lookups function for ≥ 90 % of protocols.
+  deliverables:
+    - Enhanced catalog API + CLI integration.
+  constraints:
+    - No external search engine; in-memory index only.
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-10-b6-versioning
+  name: Protocol Versioning & Migration Tools
+  domain: build.governance
+  priority: medium
+  estimatedHours: 6
+  dependencies:
+    - sprint-10-b2-protocol-completion
+spec:
+  objective: >
+    Implement basic protocol versioning and migration utilities to support evolution of schemas without manual edits.
+  context: >
+    As protocols mature, backward-compatible version management is needed to track changes and assist migration.
+  technicalRequirements:
+    - Version header support in manifest (`version: "vX.Y"`).
+    - Migration CLI (`ossp protocol migrate --from v1 --to v2`).
+    - Diff report highlighting schema and field changes.
+  implementation:
+    inputSources:
+      - Existing manifest schemas and history.
+    coreComponents:
+      - packages/cli/**
+      - packages/protocols/**
+    keyAlgorithms:
+      - Schema diff and transform generation.
+  acceptanceCriteria:
+    - Versioned manifests load correctly across protocols.
+    - Migration tool generates accurate diff reports.
+  deliverables:
+    - Versioning spec + CLI migration utility.
+  constraints:
+    - No automated merge; manual review of breaking changes required.
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-10-b7-examples
+  name: Real-World Integration Examples
+  domain: build.examples
+  priority: medium
+  estimatedHours: 8
+  dependencies:
+    - sprint-10-b2-protocol-completion
+    - sprint-10-b3-cross-rel
+spec:
+  objective: >
+    Build two production-depth integration examples demonstrating end-to-end capability using multiple protocols.
+  context: >
+    Previous examples proved conceptual integration. Now we need complex, domain-realistic patterns
+    showing multi-protocol coordination (e.g., API ↔ Workflow ↔ Event ↔ Data).
+  technicalRequirements:
+    - Example A: Enterprise data pipeline (API ↔ Data ↔ Workflow).
+    - Example B: Observability integration (Logs ↔ Metrics ↔ Event).
+    - Both validated via MCP server + Cross-Protocol Validation Engine.
+  implementation:
+    inputSources:
+      - Existing examples/microservices-pattern.
+    coreComponents:
+      - examples/enterprise-pipeline/**
+      - examples/observability-integration/**
+    keyAlgorithms:
+      - Protocol chaining and event subscription patterns.
+  acceptanceCriteria:
+    - Both examples run successfully and validate cleanly.
+    - Documentation explains architecture and steps.
+  deliverables:
+    - Two complete example projects + docs.
+  constraints:
+    - No external data sources; use mock services locally.
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-10-b8-docs
+  name: Internal Developer Documentation
+  domain: build.docs
+  priority: low
+  estimatedHours: 5
+  dependencies:
+    - sprint-10-b4-cli
+    - sprint-10-b5-catalog
+    - sprint-10-b7-examples
+spec:
+  objective: >
+    Consolidate and expand internal developer documentation covering CLI, catalog,
+    protocol suite, and integration examples.
+  context: >
+    With the protocol suite nearly complete, developers need a coherent reference
+    for building, extending, and debugging protocols internally.
+  technicalRequirements:
+    - Comprehensive docs for CLI commands, protocol schemas, and validation engine.
+    - How-to guides for common tasks (e.g., add new protocol, run validation).
+    - Integrate doc generation into CI pipeline.
+  implementation:
+    inputSources:
+      - Existing readmes and markdown files.
+    coreComponents:
+      - docs/** (markdown + templates)
+      - scripts/docgen/**
+    keyAlgorithms:
+      - Doc index generator and link checker.
+  acceptanceCriteria:
+    - Docs are complete, indexed, and validated in CI.
+    - New developer can set up and run examples < 30 min.
+  deliverables:
+    - Full internal documentation suite + auto-generated index.
+  constraints:
+    - Documentation remains internal (scope limited to builders + maintainers).
+
+---
+notes:
+  canonical: true
+  description: >
+    Sprint 10 focuses on capability completion of the protocol suite and internal tools.
+    It combines protocol hardening with CLI and catalog enhancements, deep validation,
+    and comprehensive examples to solidify the OSSP-AGI foundation for internal use.

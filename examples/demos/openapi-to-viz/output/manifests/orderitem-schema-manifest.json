@@ -1,0 +1,51 @@
+{
+  "urn": "urn:proto:data:commerce-orders-api/schema/orderitem@1.2.0",
+  "metadata": {
+    "kind": "data",
+    "name": "OrderItem Schema",
+    "version": "1.2.0",
+    "status": "derived",
+    "description": "Schema extracted from OpenAPI component: OrderItem",
+    "tags": [
+      "openapi",
+      "schema",
+      "demo"
+    ]
+  },
+  "schema": {
+    "name": "OrderItem",
+    "source": "openapi-component",
+    "ownerServiceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+    "definition": {
+      "type": "object",
+      "required": [
+        "sku",
+        "name",
+        "quantity",
+        "unitPriceCents"
+      ],
+      "properties": {
+        "sku": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "unitPriceCents": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  },
+  "relationships": {
+    "dependencies": [],
+    "consumers": [
+      "urn:proto:api:commerce-orders-api/service@1.2.0"
+    ]
+  }
+}

@@ -1,0 +1,53 @@
+# Mission File: M12.4_Performance_and_CI_Guardrails.yaml
+missionId: "M12.4-20251012"
+objective: >
+  Split CI into 'fast' and 'full' jobs; enforce simple perf budgets using the Sprint 11 perf CLI/status.
+  Keep 'fast' ≤ 5 minutes; ensure 'full' remains within agreed thresholds.
+
+context: |
+  PRE12 perf baselines are well below SLOs (esm_probe ~309ms; mcp_smoke ~125ms). We’ll set budgets accordingly,
+  and wire the fast vs full matrix. /app is the only CI working-directory, and Docker, if invoked, builds from /app.
+  References:
+    • Perf baseline captured in probe JSON                                     (probe.json)
+    • Probe summary confirms green baseline                                    (probe.md)
+    • Tools + server already respond quickly                                   (mcp.smoke.log)
+
+successCriteria:
+  - "'fast' job: unit + selected integration/e2e (MCP smoke) ≤ 5m; 'full' runs entire suite within threshold."
+  - "Perf budget gate: fail if discovery_p95 > 1000 ms or mcp_p95 > 3000 ms (tuneable in config)."
+  - "Artifacts: .artifacts/perf.json published per job."
+
+deliverables:
+  - ".github/workflows/ci.yml updated (jobs: fast, full) with working-directory: app"
+  - "Perf budget script: /app/scripts/ci/perf-budget.js"
+  - "Metrics export: 'node app/cli/index.js perf:status --format json > .artifacts/perf.json'"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Baseline perf well under targets (esm_probe 309ms; mcp_smoke 125ms)."
+      source: "/mnt/data/probe.json"  
+    - finding: "Probe summary aligns with SLO expectations."
+      source: "/mnt/data/probe.md"  
+  implementationScope:
+    coreDeliverable: >
+      CI matrix with 'fast' vs 'full'; perf budget check using existing CLI metrics; publish perf artifacts.
+    outOfScope:
+      - "Complex flaky-test quarantine (handled in separate hardening)."
+  plan:
+    - id: fast-lane
+      description: "Tag tests (@fast) or folder filters; include MCP E2E smoke."
+    - id: full-lane
+      description: "Run complete suite; upload perf.json; gate budgets."
+  validationProtocol:
+    - validator: "CI"
+      focus: "Elapsed time + budgets respected; artifacts uploaded."
+  handoffContext:
+    completed:
+      - "Guardrails to keep signal fast, comprehensive runs controlled."
+    interfaces:
+      - "gh actions: fast/full; perf CLI used for budgets"
+    assumptions:
+      - "Babel ESM config is already committed (M12.1)."
+    nextMission: "M12.5-20251012"
+    blockers: []

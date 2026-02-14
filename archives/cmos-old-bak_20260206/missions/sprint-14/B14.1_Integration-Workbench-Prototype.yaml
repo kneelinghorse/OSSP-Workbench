@@ -1,0 +1,71 @@
+name: "Build.Implementation.v1"
+version: "1.0.0"
+displayName: "Implementation Mission"
+
+missionId: "B14.1-20251028"
+objective: >
+  Build a working Integration Workbench that demonstrates chained protocol execution
+  (API → Event → Data) using the existing MCP runtime and CLI.  
+  Validate concurrency, latency, and stability against R14.2 benchmark targets.
+
+context: |
+  This mission operationalizes findings from R14.2 Integration-Workbench-Performance-Baseline-Analysis.  
+  The workbench will orchestrate multiple agents via the MCP runtime and measure round-trip latency
+  to prove that OSSP-AGI protocols deliver practical, performant integrations.  
+  Outputs provide the backbone for B14.5 (Integration Examples & Docs).
+
+successCriteria:
+  - "Executable Integration Workbench supports 3–5-step workflows (API → Event → Data)."
+  - "p95 latency ≤ 2000 ms with ≤ 5 agents; concurrency cap ≤ 8 agents per node."
+  - "Automated performance report exported to /app/reports/workbench/."
+  - "Validated against R14.2 metrics; passes CI perf gate."
+
+deliverables:
+  - "/app/src/workbench/runtime/orchestrator.ts"
+  - "/app/src/workbench/runtime/agent-runner.ts"
+  - "/app/scripts/bench/workbench-ci-benchmark.js"
+  - "/app/tests/workbench/integration-workbench.test.ts"
+  - "/app/reports/workbench/perf-results.json"
+  - "/app/docs/dev/workbench-overview.md"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "R14.2 established 2 s p95 latency target, 8-agent concurrency limit, 80 % CPU alert."
+      source: "/missions/research/R14.2_Integration-Workbench-Performance-Baseline-Analysis.md"
+  implementationScope:
+    coreDeliverable: >
+      1) Extend MCP runtime to coordinate sequential agent calls with timing hooks.  
+      2) Add CLI command `workbench run --workflow <file>` executing YAML-defined flows.  
+      3) Log timing & errors; write perf JSON for CI validation.  
+      4) Integrate perf gate into CI using thresholds from R14.2.
+    outOfScope:
+      - "GUI dashboard (handled later)."
+  plan:
+    - id: workflow-runner
+      description: "Implement sequential & parallel agent orchestration with metrics collection."
+    - id: cli-command
+      description: "Add CLI interface: `app-cli workbench run` & `workbench bench`."
+    - id: perf-validation
+      description: "Automate perf thresholds in CI; alert on regressions."
+  validationProtocol:
+    - validator: "CI-fast"
+      focus: "Perf JSON ≤ p95 2 s; concurrency ≤ 8 agents."
+    - validator: "Local"
+      focus: "Manual run confirms flow execution & logs OK."
+  handoffContext:
+    completed:
+      - "Integration Workbench executes multi-protocol flows within perf budgets."
+    interfaces:
+      - "CLI: workbench run | bench"
+    nextMission: "B14.2-20251028"
+
+outcome:
+  status: "Completed"
+  summary: >
+    Runtime orchestrator, CLI commands, benchmark harness, docs, and tests land the workbench prototype with
+    p95 latency under 2s and concurrency safeguarded at 8 agents.
+  artifacts:
+    - "app/src/workbench/runtime/orchestrator.ts"
+    - "app/scripts/bench/workbench-ci-benchmark.js"
+    - "app/tests/workbench/integration-workbench.test.ts"

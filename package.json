@@ -10,16 +10,18 @@
     "protocol-mcp-server": "./packages/runtime/bin/protocol-mcp-server.js"
   },
   "scripts": {
-    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+    "test": "jest",
     "test:watch": "jest --watch",
     "test:ci": "jest --ci --coverage --maxWorkers=2 --testTimeout=30000",
-    "test:fast": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config ./jest.fast.config.js --ci --maxWorkers=2 --testTimeout=20000",
+    "test:fast": "jest --config ./jest.fast.config.js --ci --maxWorkers=2 --testTimeout=20000",
     "generate:sprint-summary": "tsx ./scripts/reports/sprint-summary-generator.ts",
-    "test:esm:probe": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js -c ./jest.esm.ci.js --runTestsByPath tests/_probe/esm.sample.test.ts",
+    "test:esm:probe": "jest -c ./jest.esm.ci.js --runTestsByPath tests/_probe/esm.sample.test.ts",
     "test:performance": "node packages/runtime/scripts/performance-benchmark.js",
     "test:deflake": "node tests/util/deflake-runner.js",
     "test:deflake:report": "node tests/util/deflake-reporter.js",
     "check:boundaries": "node scripts/check-layer-boundaries.js",
+    "demo:openapi-viz": "node ./examples/demos/openapi-to-viz/run-demo.js",
+    "demo:asyncapi-consumer": "node ./examples/demos/asyncapi-to-consumer/run-demo.js",
     "cli": "node ./packages/runtime/cli/index.js",
     "build": "echo 'No build step required for Node.js'",
     "start": "node packages/runtime/bin/protocol-mcp-server.js",
@@ -28,7 +30,7 @@
     "docker:stop": "docker stop ossp-agi-mcp && docker rm ossp-agi-mcp",
     "ci:full": "npm run check:boundaries && npm run test:ci && npm run test:performance && npm run docker:build",
     "probe:pre12": "node scripts/probe/pre12.collect.js all",
-    "test:e2e:mcp": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runTestsByPath tests/e2e/mcp.e2e.test.ts"
+    "test:e2e:mcp": "jest --runTestsByPath tests/e2e/mcp.e2e.test.ts"
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "^10.0.3",

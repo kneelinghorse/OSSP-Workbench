@@ -1,0 +1,1504 @@
+{
+  "service": {
+    "name": "Commerce Orders API",
+    "version": "1.2.0",
+    "urn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+    "description": "Sample commerce API used for the OpenAPI to visualization demo."
+  },
+  "capabilities": {
+    "customers": {
+      "description": "Customer profile operations"
+    },
+    "orders": {
+      "description": "Order lifecycle operations"
+    }
+  },
+  "interface": {
+    "authentication": {
+      "type": "apiKey",
+      "in": "header"
+    },
+    "endpoints": [
+      {
+        "method": "GET",
+        "path": "/customers",
+        "summary": "List customers",
+        "operationId": "listCustomers",
+        "urn": "urn:proto:api.endpoint:commerce-orders-api/op/listcustomers@1.2.0",
+        "responses": [
+          {
+            "status": 200,
+            "description": "Customer list",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "customers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "email",
+                      "name"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "email": {
+                        "type": "string",
+                        "format": "email"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "address": {
+                        "type": "object",
+                        "required": [
+                          "line1",
+                          "city",
+                          "state",
+                          "postalCode",
+                          "country"
+                        ],
+                        "properties": {
+                          "line1": {
+                            "type": "string"
+                          },
+                          "city": {
+                            "type": "string"
+                          },
+                          "state": {
+                            "type": "string"
+                          },
+                          "postalCode": {
+                            "type": "string"
+                          },
+                          "country": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "defaultPaymentMethod": {
+                        "type": "object",
+                        "required": [
+                          "type",
+                          "last4"
+                        ],
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "CARD",
+                              "BANK_ACCOUNT"
+                            ]
+                          },
+                          "last4": {
+                            "type": "string",
+                            "minLength": 4,
+                            "maxLength": 4
+                          },
+                          "token": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "nextCursor": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "customers"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/customers",
+        "summary": "Create customer",
+        "operationId": "createCustomer",
+        "urn": "urn:proto:api.endpoint:commerce-orders-api/op/createcustomer@1.2.0",
+        "request": {
+          "contentType": "application/json",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "required": [
+              "email",
+              "name"
+            ],
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "name": {
+                "type": "string"
+              },
+              "address": {
+                "type": "object",
+                "required": [
+                  "line1",
+                  "city",
+                  "state",
+                  "postalCode",
+                  "country"
+                ],
+                "properties": {
+                  "line1": {
+                    "type": "string"
+                  },
+                  "city": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "postalCode": {
+                    "type": "string"
+                  },
+                  "country": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": [
+          {
+            "status": 201,
+            "description": "Customer created",
+            "schema": {
+              "type": "object",
+              "required": [
+                "id",
+                "email",
+                "name"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "address": {
+                  "type": "object",
+                  "required": [
+                    "line1",
+                    "city",
+                    "state",
+                    "postalCode",
+                    "country"
+                  ],
+                  "properties": {
+                    "line1": {
+                      "type": "string"
+                    },
+                    "city": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "type": "string"
+                    },
+                    "postalCode": {
+                      "type": "string"
+                    },
+                    "country": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "defaultPaymentMethod": {
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "last4"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "CARD",
+                        "BANK_ACCOUNT"
+                      ]
+                    },
+                    "last4": {
+                      "type": "string",
+                      "minLength": 4,
+                      "maxLength": 4
+                    },
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "errors": [
+          {
+            "code": "VALIDATION",
+            "http": 400,
+            "retriable": false,
+            "docs": "Invalid request"
+          }
+        ],
+        "tags": [
+          "customers"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/orders",
+        "summary": "List orders",
+        "operationId": "listOrders",
+        "urn": "urn:proto:api.endpoint:commerce-orders-api/op/listorders@1.2.0",
+        "params": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          }
+        ],
+        "responses": [
+          {
+            "status": 200,
+            "description": "Order list",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "orders": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "customer",
+                      "items",
+                      "totalCents",
+                      "currency",
+                      "status"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "customer": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "email",
+                          "name"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string",
+                            "format": "email"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "address": {
+                            "type": "object",
+                            "required": [
+                              "line1",
+                              "city",
+                              "state",
+                              "postalCode",
+                              "country"
+                            ],
+                            "properties": {
+                              "line1": {
+                                "type": "string"
+                              },
+                              "city": {
+                                "type": "string"
+                              },
+                              "state": {
+                                "type": "string"
+                              },
+                              "postalCode": {
+                                "type": "string"
+                              },
+                              "country": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "defaultPaymentMethod": {
+                            "type": "object",
+                            "required": [
+                              "type",
+                              "last4"
+                            ],
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "CARD",
+                                  "BANK_ACCOUNT"
+                                ]
+                              },
+                              "last4": {
+                                "type": "string",
+                                "minLength": 4,
+                                "maxLength": 4
+                              },
+                              "token": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "sku",
+                            "name",
+                            "quantity",
+                            "unitPriceCents"
+                          ],
+                          "properties": {
+                            "sku": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "quantity": {
+                              "type": "integer",
+                              "minimum": 1
+                            },
+                            "unitPriceCents": {
+                              "type": "integer",
+                              "minimum": 0
+                            }
+                          }
+                        }
+                      },
+                      "totalCents": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "currency": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "PENDING",
+                          "CONFIRMED",
+                          "FULFILLED",
+                          "CANCELLED"
+                        ]
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                },
+                "nextCursor": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "pagination": {
+          "style": "cursor",
+          "params": {
+            "cursor": "cursor",
+            "limit": "limit"
+          }
+        },
+        "tags": [
+          "orders"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/orders",
+        "summary": "Create order",
+        "operationId": "createOrder",
+        "urn": "urn:proto:api.endpoint:commerce-orders-api/op/createorder@1.2.0",
+        "request": {
+          "contentType": "application/json",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "required": [
+              "customerId",
+              "items"
+            ],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "sku",
+                    "quantity"
+                  ],
+                  "properties": {
+                    "sku": {
+                      "type": "string"
+                    },
+                    "quantity": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": [
+          {
+            "status": 201,
+            "description": "Order created",
+            "schema": {
+              "type": "object",
+              "required": [
+                "id",
+                "customer",
+                "items",
+                "totalCents",
+                "currency",
+                "status"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "customer": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "email",
+                    "name"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "type": "object",
+                      "required": [
+                        "line1",
+                        "city",
+                        "state",
+                        "postalCode",
+                        "country"
+                      ],
+                      "properties": {
+                        "line1": {
+                          "type": "string"
+                        },
+                        "city": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "type": "string"
+                        },
+                        "postalCode": {
+                          "type": "string"
+                        },
+                        "country": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "defaultPaymentMethod": {
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "last4"
+                      ],
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "CARD",
+                            "BANK_ACCOUNT"
+                          ]
+                        },
+                        "last4": {
+                          "type": "string",
+                          "minLength": 4,
+                          "maxLength": 4
+                        },
+                        "token": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "sku",
+                      "name",
+                      "quantity",
+                      "unitPriceCents"
+                    ],
+                    "properties": {
+                      "sku": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "quantity": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "unitPriceCents": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    }
+                  }
+                },
+                "totalCents": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "PENDING",
+                    "CONFIRMED",
+                    "FULFILLED",
+                    "CANCELLED"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        ],
+        "errors": [
+          {
+            "code": "UNKNOWN",
+            "http": 422,
+            "retriable": false,
+            "docs": "Validation error"
+          },
+          {
+            "code": "SERVER",
+            "http": 503,
+            "retriable": true,
+            "docs": "Downstream unavailable"
+          }
+        ],
+        "tags": [
+          "orders"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/orders/{orderId}",
+        "summary": "Get order by ID",
+        "operationId": "getOrderById",
+        "urn": "urn:proto:api.endpoint:commerce-orders-api/op/getorderbyid@1.2.0",
+        "params": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": [
+          {
+            "status": 200,
+            "description": "Order details",
+            "schema": {
+              "type": "object",
+              "required": [
+                "id",
+                "customer",
+                "items",
+                "totalCents",
+                "currency",
+                "status"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "customer": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "email",
+                    "name"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "type": "object",
+                      "required": [
+                        "line1",
+                        "city",
+                        "state",
+                        "postalCode",
+                        "country"
+                      ],
+                      "properties": {
+                        "line1": {
+                          "type": "string"
+                        },
+                        "city": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "type": "string"
+                        },
+                        "postalCode": {
+                          "type": "string"
+                        },
+                        "country": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "defaultPaymentMethod": {
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "last4"
+                      ],
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "CARD",
+                            "BANK_ACCOUNT"
+                          ]
+                        },
+                        "last4": {
+                          "type": "string",
+                          "minLength": 4,
+                          "maxLength": 4
+                        },
+                        "token": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "sku",
+                      "name",
+                      "quantity",
+                      "unitPriceCents"
+                    ],
+                    "properties": {
+                      "sku": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "quantity": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "unitPriceCents": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    }
+                  }
+                },
+                "totalCents": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "PENDING",
+                    "CONFIRMED",
+                    "FULFILLED",
+                    "CANCELLED"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        ],
+        "errors": [
+          {
+            "code": "NOT_FOUND",
+            "http": 404,
+            "retriable": false,
+            "docs": "Order not found"
+          }
+        ],
+        "tags": [
+          "orders"
+        ]
+      }
+    ]
+  },
+  "context": {
+    "servers": [
+      {
+        "url": "https://api.example.com"
+      }
+    ]
+  },
+  "validation": {
+    "schemas": {
+      "Customer": {
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "object",
+            "required": [
+              "line1",
+              "city",
+              "state",
+              "postalCode",
+              "country"
+            ],
+            "properties": {
+              "line1": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "postalCode": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              }
+            }
+          },
+          "defaultPaymentMethod": {
+            "type": "object",
+            "required": [
+              "type",
+              "last4"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "CARD",
+                  "BANK_ACCOUNT"
+                ]
+              },
+              "last4": {
+                "type": "string",
+                "minLength": 4,
+                "maxLength": 4
+              },
+              "token": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "CustomerCreateRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "name"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "object",
+            "required": [
+              "line1",
+              "city",
+              "state",
+              "postalCode",
+              "country"
+            ],
+            "properties": {
+              "line1": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "postalCode": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "CustomerListResponse": {
+        "type": "object",
+        "properties": {
+          "customers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "email",
+                "name"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "address": {
+                  "type": "object",
+                  "required": [
+                    "line1",
+                    "city",
+                    "state",
+                    "postalCode",
+                    "country"
+                  ],
+                  "properties": {
+                    "line1": {
+                      "type": "string"
+                    },
+                    "city": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "type": "string"
+                    },
+                    "postalCode": {
+                      "type": "string"
+                    },
+                    "country": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "defaultPaymentMethod": {
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "last4"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "CARD",
+                        "BANK_ACCOUNT"
+                      ]
+                    },
+                    "last4": {
+                      "type": "string",
+                      "minLength": 4,
+                      "maxLength": 4
+                    },
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "nextCursor": {
+            "type": "string"
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "required": [
+          "id",
+          "customer",
+          "items",
+          "totalCents",
+          "currency",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "customer": {
+            "type": "object",
+            "required": [
+              "id",
+              "email",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "name": {
+                "type": "string"
+              },
+              "address": {
+                "type": "object",
+                "required": [
+                  "line1",
+                  "city",
+                  "state",
+                  "postalCode",
+                  "country"
+                ],
+                "properties": {
+                  "line1": {
+                    "type": "string"
+                  },
+                  "city": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "postalCode": {
+                    "type": "string"
+                  },
+                  "country": {
+                    "type": "string"
+                  }
+                }
+              },
+              "defaultPaymentMethod": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "last4"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "CARD",
+                      "BANK_ACCOUNT"
+                    ]
+                  },
+                  "last4": {
+                    "type": "string",
+                    "minLength": 4,
+                    "maxLength": 4
+                  },
+                  "token": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "sku",
+                "name",
+                "quantity",
+                "unitPriceCents"
+              ],
+              "properties": {
+                "sku": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "unitPriceCents": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "totalCents": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "FULFILLED",
+              "CANCELLED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "OrderItem": {
+        "type": "object",
+        "required": [
+          "sku",
+          "name",
+          "quantity",
+          "unitPriceCents"
+        ],
+        "properties": {
+          "sku": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "unitPriceCents": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "OrderCreateRequest": {
+        "type": "object",
+        "required": [
+          "customerId",
+          "items"
+        ],
+        "properties": {
+          "customerId": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "sku",
+                "quantity"
+              ],
+              "properties": {
+                "sku": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        }
+      },
+      "OrderItemCreate": {
+        "type": "object",
+        "required": [
+          "sku",
+          "quantity"
+        ],
+        "properties": {
+          "sku": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "OrderListResponse": {
+        "type": "object",
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "customer",
+                "items",
+                "totalCents",
+                "currency",
+                "status"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "customer": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "email",
+                    "name"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "type": "object",
+                      "required": [
+                        "line1",
+                        "city",
+                        "state",
+                        "postalCode",
+                        "country"
+                      ],
+                      "properties": {
+                        "line1": {
+                          "type": "string"
+                        },
+                        "city": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "type": "string"
+                        },
+                        "postalCode": {
+                          "type": "string"
+                        },
+                        "country": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "defaultPaymentMethod": {
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "last4"
+                      ],
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "CARD",
+                            "BANK_ACCOUNT"
+                          ]
+                        },
+                        "last4": {
+                          "type": "string",
+                          "minLength": 4,
+                          "maxLength": 4
+                        },
+                        "token": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "sku",
+                      "name",
+                      "quantity",
+                      "unitPriceCents"
+                    ],
+                    "properties": {
+                      "sku": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "quantity": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "unitPriceCents": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    }
+                  }
+                },
+                "totalCents": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "PENDING",
+                    "CONFIRMED",
+                    "FULFILLED",
+                    "CANCELLED"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
+          "nextCursor": {
+            "type": "string"
+          }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "required": [
+          "line1",
+          "city",
+          "state",
+          "postalCode",
+          "country"
+        ],
+        "properties": {
+          "line1": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentMethod": {
+        "type": "object",
+        "required": [
+          "type",
+          "last4"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "CARD",
+              "BANK_ACCOUNT"
+            ]
+          },
+          "last4": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 4
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "required": [
+          "title",
+          "status"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "extensions": {
+      "x-dependencies": [
+        "urn:proto:api:inventory-service/service@1.4.0",
+        "urn:proto:api:billing-service/service@2.3.1"
+      ]
+    },
+    "status": "draft",
+    "source": {
+      "type": "openapi",
+      "version": "3.0.3",
+      "imported_at": "2026-02-12T05:01:15.355Z",
+      "input_type": "string",
+      "reference": "/Users/systemsystems/portfolio/OSSP-Workbench/examples/demos/openapi-to-viz/sample-spec.json"
+    },
+    "kind": "api"
+  },
+  "relationships": {
+    "dependencies": [
+      "urn:proto:api:inventory-service/service@1.4.0",
+      "urn:proto:api:billing-service/service@2.3.1"
+    ],
+    "schemas": [
+      "urn:proto:data:commerce-orders-api/schema/customer@1.2.0",
+      "urn:proto:data:commerce-orders-api/schema/customercreaterequest@1.2.0",
+      "urn:proto:data:commerce-orders-api/schema/customerlistresponse@1.2.0",
+      "urn:proto:data:commerce-orders-api/schema/order@1.2.0",
+      "urn:proto:data:commerce-orders-api/schema/orderitem@1.2.0",
+      "urn:proto:data:commerce-orders-api/schema/ordercreaterequest@1.2.0",
+      "urn:proto:data:commerce-orders-api/schema/orderitemcreate@1.2.0",
+      "urn:proto:data:commerce-orders-api/schema/orderlistresponse@1.2.0",
+      "urn:proto:data:commerce-orders-api/schema/address@1.2.0",
+      "urn:proto:data:commerce-orders-api/schema/paymentmethod@1.2.0",
+      "urn:proto:data:commerce-orders-api/schema/problem@1.2.0"
+    ]
+  },
+  "provenance": {
+    "importer": "OpenAPIImporter",
+    "importer_version": "0.1.0",
+    "imported_at": "2026-02-12T05:01:15.355Z",
+    "spec_version": "3.0.3",
+    "spec_hash": "1e29a03164bb83666e0243db08a099c632b98efcc23e1391ea7c2227010580b7",
+    "source": "/Users/systemsystems/portfolio/OSSP-Workbench/examples/demos/openapi-to-viz/sample-spec.json",
+    "source_type": "string"
+  },
+  "urn": "urn:proto:api:commerce-orders-api/service@1.2.0"
+}

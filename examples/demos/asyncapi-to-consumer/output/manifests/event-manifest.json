@@ -1,0 +1,263 @@
+{
+  "protocol": "event-protocol/v1",
+  "urn": "urn:events:customer:events:profile-updated",
+  "event": {
+    "name": "customer.events.profile-updated",
+    "version": "1.4.0",
+    "lifecycle": {
+      "status": "active"
+    }
+  },
+  "semantics": {
+    "purpose": "Customer profile update stream",
+    "category": "event"
+  },
+  "schema": {
+    "format": "json-schema",
+    "payload": {
+      "type": "object",
+      "required": [
+        "user_id",
+        "updated_at"
+      ],
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "description": "Customer identifier",
+          "x-parser-schema-id": "<anonymous-schema-1>"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-parser-schema-id": "<anonymous-schema-2>"
+        },
+        "event_id": {
+          "type": "string",
+          "x-parser-schema-id": "<anonymous-schema-3>"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Customer email address",
+          "x-parser-schema-id": "<anonymous-schema-4>"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Customer phone number",
+          "x-parser-schema-id": "<anonymous-schema-5>"
+        },
+        "given_name": {
+          "type": "string",
+          "description": "Customer given name",
+          "x-parser-schema-id": "<anonymous-schema-6>"
+        },
+        "family_name": {
+          "type": "string",
+          "description": "Customer family name",
+          "x-parser-schema-id": "<anonymous-schema-7>"
+        },
+        "address_line_1": {
+          "type": "string",
+          "x-parser-schema-id": "<anonymous-schema-8>"
+        },
+        "city": {
+          "type": "string",
+          "x-parser-schema-id": "<anonymous-schema-9>"
+        },
+        "state": {
+          "type": "string",
+          "x-parser-schema-id": "<anonymous-schema-10>"
+        },
+        "postal_code": {
+          "type": "string",
+          "x-parser-schema-id": "<anonymous-schema-11>"
+        },
+        "marketing_opt_in": {
+          "type": "boolean",
+          "x-parser-schema-id": "<anonymous-schema-12>"
+        },
+        "loyalty_tier": {
+          "type": "string",
+          "x-parser-schema-id": "<anonymous-schema-13>"
+        }
+      },
+      "x-parser-schema-id": "customerProfileUpdatedPayload"
+    },
+    "fields": [
+      {
+        "name": "user_id",
+        "type": "string",
+        "required": false,
+        "pii": true,
+        "confidence": 0.8049999999999999,
+        "tier": "contextual",
+        "category": "identifier",
+        "description": "Customer identifier"
+      },
+      {
+        "name": "email",
+        "type": "string",
+        "required": false,
+        "pii": true,
+        "confidence": 1,
+        "tier": "definite",
+        "category": "email",
+        "description": "Customer email address"
+      },
+      {
+        "name": "phone",
+        "type": "string",
+        "required": false,
+        "pii": true,
+        "confidence": 1,
+        "tier": "definite",
+        "category": "phone",
+        "description": "Customer phone number"
+      },
+      {
+        "name": "given_name",
+        "type": "string",
+        "required": false,
+        "pii": true,
+        "confidence": 0.9774999999999999,
+        "tier": "potential",
+        "category": "name",
+        "description": "Customer given name"
+      },
+      {
+        "name": "family_name",
+        "type": "string",
+        "required": false,
+        "pii": true,
+        "confidence": 0.9774999999999999,
+        "tier": "potential",
+        "category": "name",
+        "description": "Customer family name"
+      },
+      {
+        "name": "address_line_1",
+        "type": "string",
+        "required": false,
+        "pii": true,
+        "confidence": 0.9774999999999999,
+        "tier": "potential",
+        "category": "address"
+      },
+      {
+        "name": "city",
+        "type": "string",
+        "required": false,
+        "pii": true,
+        "confidence": 0.9774999999999999,
+        "tier": "potential",
+        "category": "address"
+      },
+      {
+        "name": "state",
+        "type": "string",
+        "required": false,
+        "pii": true,
+        "confidence": 0.9774999999999999,
+        "tier": "potential",
+        "category": "address"
+      },
+      {
+        "name": "postal_code",
+        "type": "string",
+        "required": false,
+        "pii": true,
+        "confidence": 0.9774999999999999,
+        "tier": "potential",
+        "category": "address"
+      },
+      {
+        "name": "marketing_opt_in",
+        "type": "boolean",
+        "required": false,
+        "pii": true,
+        "confidence": 1,
+        "tier": "definite",
+        "category": "government_id"
+      }
+    ],
+    "compatibility": {
+      "policy": "backward"
+    }
+  },
+  "delivery": {
+    "contract": {
+      "transport": "kafka",
+      "topic": "customer.events.profile-updated",
+      "guarantees": "at-least-once",
+      "retry_policy": "exponential",
+      "dlq": "customer.events.profile-updated.dlq",
+      "metadata": {
+        "partitions": 6,
+        "pointer": "/channels/customer.events.profile-updated/bindings/kafka",
+        "channel": "customer.events.profile-updated",
+        "retry.backoff.ms": 2000
+      },
+      "confidence": 0.99,
+      "source": "explicit_binding"
+    }
+  },
+  "governance": {
+    "policy": {
+      "classification": "pii",
+      "legal_basis": "gdpr"
+    }
+  },
+  "metadata": {
+    "source_type": "asyncapi",
+    "source_version": "2.6.0",
+    "source_title": "Customer Profile Events",
+    "source_hash": "50418733c6438f6d",
+    "imported_at": "2026-02-12T05:01:15.964Z",
+    "importer_version": "0.1.0",
+    "kind": "event",
+    "status": "draft"
+  },
+  "patterns": {
+    "detected": [
+      {
+        "pattern": "dlq_configured",
+        "confidence": 0.95,
+        "severity": "info",
+        "message": "DLQ properly configured for PII event with retries",
+        "recommendation": "Monitor DLQ for unprocessed PII events",
+        "metadata": {
+          "has_pii": true,
+          "retry_policy": "exponential",
+          "dlq_config": "customer.events.profile-updated.dlq"
+        }
+      },
+      {
+        "pattern": "user_keyed_ordering",
+        "confidence": 0.8,
+        "severity": "info",
+        "message": "Events are likely ordered per user (partition heuristic)",
+        "recommendation": "Ensure downstream consumers handle per-user ordering",
+        "metadata": {
+          "transport": "kafka",
+          "key_field": "user_id"
+        }
+      },
+      {
+        "pattern": "backward_compatible_schema",
+        "confidence": 0.7,
+        "severity": "info",
+        "message": "85% optional fields suggests backward compatibility",
+        "recommendation": "Schema evolution appears safe for consumers",
+        "metadata": {
+          "optional_fields": 11,
+          "required_fields": 2,
+          "optional_ratio": 0.8461538461538461
+        }
+      }
+    ],
+    "total_count": 3,
+    "error_count": 0,
+    "warning_count": 0,
+    "info_count": 3
+  }
+}

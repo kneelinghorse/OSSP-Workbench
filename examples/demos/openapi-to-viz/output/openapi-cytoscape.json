@@ -1,0 +1,1043 @@
+{
+  "format": "cytoscape-v1",
+  "generatedAt": "2026-02-12T05:01:15.407Z",
+  "graph": {
+    "id": "catalog-graph",
+    "name": "OpenAPI Demo Catalog Graph",
+    "description": "OpenAPI 3.x import demo graph with service and schema relationships.",
+    "version": "1.0.0"
+  },
+  "stats": {
+    "nodes": 14,
+    "edges": 32
+  },
+  "metadata": {
+    "workspace": "/Users/systemsystems/portfolio/OSSP-Workbench/examples/demos/openapi-to-viz/output",
+    "inputs": [
+      "manifests/address-schema-manifest.json",
+      "manifests/customer-schema-manifest.json",
+      "manifests/customercreaterequest-schema-manifest.json",
+      "manifests/customerlistresponse-schema-manifest.json",
+      "manifests/order-schema-manifest.json",
+      "manifests/ordercreaterequest-schema-manifest.json",
+      "manifests/orderitem-schema-manifest.json",
+      "manifests/orderitemcreate-schema-manifest.json",
+      "manifests/orderlistresponse-schema-manifest.json",
+      "manifests/paymentmethod-schema-manifest.json",
+      "manifests/problem-schema-manifest.json",
+      "manifests/service-manifest.json"
+    ],
+    "counts": {
+      "manifests": 12,
+      "nodes": 14,
+      "edges": 32
+    },
+    "filters": null,
+    "stats": {
+      "discarded": {
+        "nodes": 0
+      },
+      "externalNodes": 2,
+      "relationshipsProcessed": 32
+    }
+  },
+  "elements": {
+    "nodes": [
+      {
+        "data": {
+          "id": "c348224ec10af548",
+          "label": "Address Schema",
+          "type": "data",
+          "domain": "data",
+          "description": "Schema extracted from OpenAPI component: Address",
+          "metadata": {
+            "version": "1.2.0",
+            "kind": "data",
+            "domain": "data",
+            "description": "Schema extracted from OpenAPI component: Address",
+            "status": "derived",
+            "tags": [
+              "openapi",
+              "schema",
+              "demo"
+            ]
+          },
+          "urn": "urn:proto:data:commerce-orders-api/schema/address@1.2.0"
+        },
+        "classes": "type-data domain-data"
+      },
+      {
+        "data": {
+          "id": "9d6815d414dba482",
+          "label": "Customer Schema",
+          "type": "data",
+          "domain": "data",
+          "description": "Schema extracted from OpenAPI component: Customer",
+          "metadata": {
+            "version": "1.2.0",
+            "kind": "data",
+            "domain": "data",
+            "description": "Schema extracted from OpenAPI component: Customer",
+            "status": "derived",
+            "tags": [
+              "openapi",
+              "schema",
+              "demo"
+            ]
+          },
+          "urn": "urn:proto:data:commerce-orders-api/schema/customer@1.2.0"
+        },
+        "classes": "type-data domain-data"
+      },
+      {
+        "data": {
+          "id": "18cab9778ad69916",
+          "label": "CustomerCreateRequest Schema",
+          "type": "data",
+          "domain": "data",
+          "description": "Schema extracted from OpenAPI component: CustomerCreateRequest",
+          "metadata": {
+            "version": "1.2.0",
+            "kind": "data",
+            "domain": "data",
+            "description": "Schema extracted from OpenAPI component: CustomerCreateRequest",
+            "status": "derived",
+            "tags": [
+              "openapi",
+              "schema",
+              "demo"
+            ]
+          },
+          "urn": "urn:proto:data:commerce-orders-api/schema/customercreaterequest@1.2.0"
+        },
+        "classes": "type-data domain-data"
+      },
+      {
+        "data": {
+          "id": "fbc9233dfda170ee",
+          "label": "CustomerListResponse Schema",
+          "type": "data",
+          "domain": "data",
+          "description": "Schema extracted from OpenAPI component: CustomerListResponse",
+          "metadata": {
+            "version": "1.2.0",
+            "kind": "data",
+            "domain": "data",
+            "description": "Schema extracted from OpenAPI component: CustomerListResponse",
+            "status": "derived",
+            "tags": [
+              "openapi",
+              "schema",
+              "demo"
+            ]
+          },
+          "urn": "urn:proto:data:commerce-orders-api/schema/customerlistresponse@1.2.0"
+        },
+        "classes": "type-data domain-data"
+      },
+      {
+        "data": {
+          "id": "a6401d44de50a716",
+          "label": "Order Schema",
+          "type": "data",
+          "domain": "data",
+          "description": "Schema extracted from OpenAPI component: Order",
+          "metadata": {
+            "version": "1.2.0",
+            "kind": "data",
+            "domain": "data",
+            "description": "Schema extracted from OpenAPI component: Order",
+            "status": "derived",
+            "tags": [
+              "openapi",
+              "schema",
+              "demo"
+            ]
+          },
+          "urn": "urn:proto:data:commerce-orders-api/schema/order@1.2.0"
+        },
+        "classes": "type-data domain-data"
+      },
+      {
+        "data": {
+          "id": "15162f42d59abc5d",
+          "label": "OrderCreateRequest Schema",
+          "type": "data",
+          "domain": "data",
+          "description": "Schema extracted from OpenAPI component: OrderCreateRequest",
+          "metadata": {
+            "version": "1.2.0",
+            "kind": "data",
+            "domain": "data",
+            "description": "Schema extracted from OpenAPI component: OrderCreateRequest",
+            "status": "derived",
+            "tags": [
+              "openapi",
+              "schema",
+              "demo"
+            ]
+          },
+          "urn": "urn:proto:data:commerce-orders-api/schema/ordercreaterequest@1.2.0"
+        },
+        "classes": "type-data domain-data"
+      },
+      {
+        "data": {
+          "id": "97af2b2419266338",
+          "label": "OrderItem Schema",
+          "type": "data",
+          "domain": "data",
+          "description": "Schema extracted from OpenAPI component: OrderItem",
+          "metadata": {
+            "version": "1.2.0",
+            "kind": "data",
+            "domain": "data",
+            "description": "Schema extracted from OpenAPI component: OrderItem",
+            "status": "derived",
+            "tags": [
+              "openapi",
+              "schema",
+              "demo"
+            ]
+          },
+          "urn": "urn:proto:data:commerce-orders-api/schema/orderitem@1.2.0"
+        },
+        "classes": "type-data domain-data"
+      },
+      {
+        "data": {
+          "id": "9a8e52d61df4c639",
+          "label": "OrderItemCreate Schema",
+          "type": "data",
+          "domain": "data",
+          "description": "Schema extracted from OpenAPI component: OrderItemCreate",
+          "metadata": {
+            "version": "1.2.0",
+            "kind": "data",
+            "domain": "data",
+            "description": "Schema extracted from OpenAPI component: OrderItemCreate",
+            "status": "derived",
+            "tags": [
+              "openapi",
+              "schema",
+              "demo"
+            ]
+          },
+          "urn": "urn:proto:data:commerce-orders-api/schema/orderitemcreate@1.2.0"
+        },
+        "classes": "type-data domain-data"
+      },
+      {
+        "data": {
+          "id": "2a4a429184e80c1e",
+          "label": "OrderListResponse Schema",
+          "type": "data",
+          "domain": "data",
+          "description": "Schema extracted from OpenAPI component: OrderListResponse",
+          "metadata": {
+            "version": "1.2.0",
+            "kind": "data",
+            "domain": "data",
+            "description": "Schema extracted from OpenAPI component: OrderListResponse",
+            "status": "derived",
+            "tags": [
+              "openapi",
+              "schema",
+              "demo"
+            ]
+          },
+          "urn": "urn:proto:data:commerce-orders-api/schema/orderlistresponse@1.2.0"
+        },
+        "classes": "type-data domain-data"
+      },
+      {
+        "data": {
+          "id": "10d02e5202eff689",
+          "label": "PaymentMethod Schema",
+          "type": "data",
+          "domain": "data",
+          "description": "Schema extracted from OpenAPI component: PaymentMethod",
+          "metadata": {
+            "version": "1.2.0",
+            "kind": "data",
+            "domain": "data",
+            "description": "Schema extracted from OpenAPI component: PaymentMethod",
+            "status": "derived",
+            "tags": [
+              "openapi",
+              "schema",
+              "demo"
+            ]
+          },
+          "urn": "urn:proto:data:commerce-orders-api/schema/paymentmethod@1.2.0"
+        },
+        "classes": "type-data domain-data"
+      },
+      {
+        "data": {
+          "id": "2d8dc2fc2067decc",
+          "label": "Problem Schema",
+          "type": "data",
+          "domain": "data",
+          "description": "Schema extracted from OpenAPI component: Problem",
+          "metadata": {
+            "version": "1.2.0",
+            "kind": "data",
+            "domain": "data",
+            "description": "Schema extracted from OpenAPI component: Problem",
+            "status": "derived",
+            "tags": [
+              "openapi",
+              "schema",
+              "demo"
+            ]
+          },
+          "urn": "urn:proto:data:commerce-orders-api/schema/problem@1.2.0"
+        },
+        "classes": "type-data domain-data"
+      },
+      {
+        "data": {
+          "id": "c0eeb7a24745f456",
+          "label": "Commerce Orders API",
+          "type": "api",
+          "domain": "api",
+          "description": null,
+          "metadata": {
+            "version": "1.2.0",
+            "kind": "api",
+            "domain": "api",
+            "status": "draft"
+          },
+          "urn": "urn:proto:api:commerce-orders-api/service@1.2.0"
+        },
+        "classes": "type-api domain-api"
+      },
+      {
+        "data": {
+          "id": "c4b912b4a2db61a3",
+          "label": "urn:proto:api:inventory-service/service@1.4.0",
+          "type": "external",
+          "domain": "external",
+          "description": null,
+          "metadata": {
+            "external": true,
+            "urn": "urn:proto:api:inventory-service/service@1.4.0"
+          },
+          "urn": "urn:proto:api:inventory-service/service@1.4.0"
+        },
+        "classes": "type-external domain-external"
+      },
+      {
+        "data": {
+          "id": "7927031577af4496",
+          "label": "urn:proto:api:billing-service/service@2.3.1",
+          "type": "external",
+          "domain": "external",
+          "description": null,
+          "metadata": {
+            "external": true,
+            "urn": "urn:proto:api:billing-service/service@2.3.1"
+          },
+          "urn": "urn:proto:api:billing-service/service@2.3.1"
+        },
+        "classes": "type-external domain-external"
+      }
+    ],
+    "edges": [
+      {
+        "data": {
+          "id": "3e8d073337315474",
+          "source": "c348224ec10af548",
+          "target": "c0eeb7a24745f456",
+          "type": "consumers",
+          "label": "Consumers",
+          "metadata": {
+            "relationship": "consumers",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/address@1.2.0",
+            "targetUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "sourcePath": "manifests/address-schema-manifest.json",
+            "targetPath": "manifests/service-manifest.json"
+          }
+        },
+        "classes": "type-consumers"
+      },
+      {
+        "data": {
+          "id": "835a90d74808965b",
+          "source": "9d6815d414dba482",
+          "target": "c348224ec10af548",
+          "type": "dependencies",
+          "label": "Dependencies",
+          "metadata": {
+            "relationship": "dependencies",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/customer@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/address@1.2.0",
+            "sourcePath": "manifests/customer-schema-manifest.json",
+            "targetPath": "manifests/address-schema-manifest.json"
+          }
+        },
+        "classes": "type-dependencies"
+      },
+      {
+        "data": {
+          "id": "ffd3e8c2d7395255",
+          "source": "9d6815d414dba482",
+          "target": "10d02e5202eff689",
+          "type": "dependencies",
+          "label": "Dependencies",
+          "metadata": {
+            "relationship": "dependencies",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/customer@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/paymentmethod@1.2.0",
+            "sourcePath": "manifests/customer-schema-manifest.json",
+            "targetPath": "manifests/paymentmethod-schema-manifest.json"
+          }
+        },
+        "classes": "type-dependencies"
+      },
+      {
+        "data": {
+          "id": "d14180af535636bf",
+          "source": "9d6815d414dba482",
+          "target": "c0eeb7a24745f456",
+          "type": "consumers",
+          "label": "Consumers",
+          "metadata": {
+            "relationship": "consumers",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/customer@1.2.0",
+            "targetUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "sourcePath": "manifests/customer-schema-manifest.json",
+            "targetPath": "manifests/service-manifest.json"
+          }
+        },
+        "classes": "type-consumers"
+      },
+      {
+        "data": {
+          "id": "98081d9d48ccd317",
+          "source": "18cab9778ad69916",
+          "target": "c348224ec10af548",
+          "type": "dependencies",
+          "label": "Dependencies",
+          "metadata": {
+            "relationship": "dependencies",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/customercreaterequest@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/address@1.2.0",
+            "sourcePath": "manifests/customercreaterequest-schema-manifest.json",
+            "targetPath": "manifests/address-schema-manifest.json"
+          }
+        },
+        "classes": "type-dependencies"
+      },
+      {
+        "data": {
+          "id": "0456e3e2fbbd5571",
+          "source": "18cab9778ad69916",
+          "target": "c0eeb7a24745f456",
+          "type": "consumers",
+          "label": "Consumers",
+          "metadata": {
+            "relationship": "consumers",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/customercreaterequest@1.2.0",
+            "targetUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "sourcePath": "manifests/customercreaterequest-schema-manifest.json",
+            "targetPath": "manifests/service-manifest.json"
+          }
+        },
+        "classes": "type-consumers"
+      },
+      {
+        "data": {
+          "id": "eed2fcf3723ba472",
+          "source": "fbc9233dfda170ee",
+          "target": "9d6815d414dba482",
+          "type": "dependencies",
+          "label": "Dependencies",
+          "metadata": {
+            "relationship": "dependencies",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/customerlistresponse@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/customer@1.2.0",
+            "sourcePath": "manifests/customerlistresponse-schema-manifest.json",
+            "targetPath": "manifests/customer-schema-manifest.json"
+          }
+        },
+        "classes": "type-dependencies"
+      },
+      {
+        "data": {
+          "id": "76d443833c0d18c9",
+          "source": "fbc9233dfda170ee",
+          "target": "c0eeb7a24745f456",
+          "type": "consumers",
+          "label": "Consumers",
+          "metadata": {
+            "relationship": "consumers",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/customerlistresponse@1.2.0",
+            "targetUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "sourcePath": "manifests/customerlistresponse-schema-manifest.json",
+            "targetPath": "manifests/service-manifest.json"
+          }
+        },
+        "classes": "type-consumers"
+      },
+      {
+        "data": {
+          "id": "622576698ebe1994",
+          "source": "a6401d44de50a716",
+          "target": "9d6815d414dba482",
+          "type": "dependencies",
+          "label": "Dependencies",
+          "metadata": {
+            "relationship": "dependencies",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/order@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/customer@1.2.0",
+            "sourcePath": "manifests/order-schema-manifest.json",
+            "targetPath": "manifests/customer-schema-manifest.json"
+          }
+        },
+        "classes": "type-dependencies"
+      },
+      {
+        "data": {
+          "id": "92b6ae657d35a2ea",
+          "source": "a6401d44de50a716",
+          "target": "97af2b2419266338",
+          "type": "dependencies",
+          "label": "Dependencies",
+          "metadata": {
+            "relationship": "dependencies",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/order@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/orderitem@1.2.0",
+            "sourcePath": "manifests/order-schema-manifest.json",
+            "targetPath": "manifests/orderitem-schema-manifest.json"
+          }
+        },
+        "classes": "type-dependencies"
+      },
+      {
+        "data": {
+          "id": "3159a4c6d9105a62",
+          "source": "a6401d44de50a716",
+          "target": "c0eeb7a24745f456",
+          "type": "consumers",
+          "label": "Consumers",
+          "metadata": {
+            "relationship": "consumers",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/order@1.2.0",
+            "targetUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "sourcePath": "manifests/order-schema-manifest.json",
+            "targetPath": "manifests/service-manifest.json"
+          }
+        },
+        "classes": "type-consumers"
+      },
+      {
+        "data": {
+          "id": "411968ff675366c3",
+          "source": "15162f42d59abc5d",
+          "target": "9a8e52d61df4c639",
+          "type": "dependencies",
+          "label": "Dependencies",
+          "metadata": {
+            "relationship": "dependencies",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/ordercreaterequest@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/orderitemcreate@1.2.0",
+            "sourcePath": "manifests/ordercreaterequest-schema-manifest.json",
+            "targetPath": "manifests/orderitemcreate-schema-manifest.json"
+          }
+        },
+        "classes": "type-dependencies"
+      },
+      {
+        "data": {
+          "id": "90ba4bdccc50e296",
+          "source": "15162f42d59abc5d",
+          "target": "c0eeb7a24745f456",
+          "type": "consumers",
+          "label": "Consumers",
+          "metadata": {
+            "relationship": "consumers",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/ordercreaterequest@1.2.0",
+            "targetUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "sourcePath": "manifests/ordercreaterequest-schema-manifest.json",
+            "targetPath": "manifests/service-manifest.json"
+          }
+        },
+        "classes": "type-consumers"
+      },
+      {
+        "data": {
+          "id": "e21e004d2c2543ac",
+          "source": "97af2b2419266338",
+          "target": "c0eeb7a24745f456",
+          "type": "consumers",
+          "label": "Consumers",
+          "metadata": {
+            "relationship": "consumers",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/orderitem@1.2.0",
+            "targetUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "sourcePath": "manifests/orderitem-schema-manifest.json",
+            "targetPath": "manifests/service-manifest.json"
+          }
+        },
+        "classes": "type-consumers"
+      },
+      {
+        "data": {
+          "id": "62da2ecc8f4f9c54",
+          "source": "9a8e52d61df4c639",
+          "target": "c0eeb7a24745f456",
+          "type": "consumers",
+          "label": "Consumers",
+          "metadata": {
+            "relationship": "consumers",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/orderitemcreate@1.2.0",
+            "targetUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "sourcePath": "manifests/orderitemcreate-schema-manifest.json",
+            "targetPath": "manifests/service-manifest.json"
+          }
+        },
+        "classes": "type-consumers"
+      },
+      {
+        "data": {
+          "id": "902268d9d17c6ea2",
+          "source": "2a4a429184e80c1e",
+          "target": "a6401d44de50a716",
+          "type": "dependencies",
+          "label": "Dependencies",
+          "metadata": {
+            "relationship": "dependencies",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/orderlistresponse@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/order@1.2.0",
+            "sourcePath": "manifests/orderlistresponse-schema-manifest.json",
+            "targetPath": "manifests/order-schema-manifest.json"
+          }
+        },
+        "classes": "type-dependencies"
+      },
+      {
+        "data": {
+          "id": "79c55dc225934d0c",
+          "source": "2a4a429184e80c1e",
+          "target": "c0eeb7a24745f456",
+          "type": "consumers",
+          "label": "Consumers",
+          "metadata": {
+            "relationship": "consumers",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/orderlistresponse@1.2.0",
+            "targetUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "sourcePath": "manifests/orderlistresponse-schema-manifest.json",
+            "targetPath": "manifests/service-manifest.json"
+          }
+        },
+        "classes": "type-consumers"
+      },
+      {
+        "data": {
+          "id": "2bef4e8243bc25fc",
+          "source": "10d02e5202eff689",
+          "target": "c0eeb7a24745f456",
+          "type": "consumers",
+          "label": "Consumers",
+          "metadata": {
+            "relationship": "consumers",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/paymentmethod@1.2.0",
+            "targetUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "sourcePath": "manifests/paymentmethod-schema-manifest.json",
+            "targetPath": "manifests/service-manifest.json"
+          }
+        },
+        "classes": "type-consumers"
+      },
+      {
+        "data": {
+          "id": "9141e2ca49a6c0b9",
+          "source": "2d8dc2fc2067decc",
+          "target": "c0eeb7a24745f456",
+          "type": "consumers",
+          "label": "Consumers",
+          "metadata": {
+            "relationship": "consumers",
+            "sourceUrn": "urn:proto:data:commerce-orders-api/schema/problem@1.2.0",
+            "targetUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "sourcePath": "manifests/problem-schema-manifest.json",
+            "targetPath": "manifests/service-manifest.json"
+          }
+        },
+        "classes": "type-consumers"
+      },
+      {
+        "data": {
+          "id": "1fe91b3c4e327b3d",
+          "source": "c0eeb7a24745f456",
+          "target": "c4b912b4a2db61a3",
+          "type": "dependencies",
+          "label": "Dependencies",
+          "metadata": {
+            "relationship": "dependencies",
+            "sourceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "targetUrn": "urn:proto:api:inventory-service/service@1.4.0",
+            "sourcePath": "manifests/service-manifest.json",
+            "targetPath": null
+          }
+        },
+        "classes": "type-dependencies"
+      },
+      {
+        "data": {
+          "id": "d83b94d924b0ae87",
+          "source": "c0eeb7a24745f456",
+          "target": "7927031577af4496",
+          "type": "dependencies",
+          "label": "Dependencies",
+          "metadata": {
+            "relationship": "dependencies",
+            "sourceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "targetUrn": "urn:proto:api:billing-service/service@2.3.1",
+            "sourcePath": "manifests/service-manifest.json",
+            "targetPath": null
+          }
+        },
+        "classes": "type-dependencies"
+      },
+      {
+        "data": {
+          "id": "016bd1a7d0826d4d",
+          "source": "c0eeb7a24745f456",
+          "target": "9d6815d414dba482",
+          "type": "schemas",
+          "label": "Schemas",
+          "metadata": {
+            "relationship": "schemas",
+            "sourceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/customer@1.2.0",
+            "sourcePath": "manifests/service-manifest.json",
+            "targetPath": "manifests/customer-schema-manifest.json"
+          }
+        },
+        "classes": "type-schemas"
+      },
+      {
+        "data": {
+          "id": "3e1045e174d551de",
+          "source": "c0eeb7a24745f456",
+          "target": "18cab9778ad69916",
+          "type": "schemas",
+          "label": "Schemas",
+          "metadata": {
+            "relationship": "schemas",
+            "sourceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/customercreaterequest@1.2.0",
+            "sourcePath": "manifests/service-manifest.json",
+            "targetPath": "manifests/customercreaterequest-schema-manifest.json"
+          }
+        },
+        "classes": "type-schemas"
+      },
+      {
+        "data": {
+          "id": "ff005bc4f0a9e305",
+          "source": "c0eeb7a24745f456",
+          "target": "fbc9233dfda170ee",
+          "type": "schemas",
+          "label": "Schemas",
+          "metadata": {
+            "relationship": "schemas",
+            "sourceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/customerlistresponse@1.2.0",
+            "sourcePath": "manifests/service-manifest.json",
+            "targetPath": "manifests/customerlistresponse-schema-manifest.json"
+          }
+        },
+        "classes": "type-schemas"
+      },
+      {
+        "data": {
+          "id": "d9e4fdae982ca958",
+          "source": "c0eeb7a24745f456",
+          "target": "a6401d44de50a716",
+          "type": "schemas",
+          "label": "Schemas",
+          "metadata": {
+            "relationship": "schemas",
+            "sourceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/order@1.2.0",
+            "sourcePath": "manifests/service-manifest.json",
+            "targetPath": "manifests/order-schema-manifest.json"
+          }
+        },
+        "classes": "type-schemas"
+      },
+      {
+        "data": {
+          "id": "99c66cae6dc1b9c1",
+          "source": "c0eeb7a24745f456",
+          "target": "97af2b2419266338",
+          "type": "schemas",
+          "label": "Schemas",
+          "metadata": {
+            "relationship": "schemas",
+            "sourceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/orderitem@1.2.0",
+            "sourcePath": "manifests/service-manifest.json",
+            "targetPath": "manifests/orderitem-schema-manifest.json"
+          }
+        },
+        "classes": "type-schemas"
+      },
+      {
+        "data": {
+          "id": "e3021405f874163d",
+          "source": "c0eeb7a24745f456",
+          "target": "15162f42d59abc5d",
+          "type": "schemas",
+          "label": "Schemas",
+          "metadata": {
+            "relationship": "schemas",
+            "sourceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/ordercreaterequest@1.2.0",
+            "sourcePath": "manifests/service-manifest.json",
+            "targetPath": "manifests/ordercreaterequest-schema-manifest.json"
+          }
+        },
+        "classes": "type-schemas"
+      },
+      {
+        "data": {
+          "id": "2c73b2b68a6b16d5",
+          "source": "c0eeb7a24745f456",
+          "target": "9a8e52d61df4c639",
+          "type": "schemas",
+          "label": "Schemas",
+          "metadata": {
+            "relationship": "schemas",
+            "sourceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/orderitemcreate@1.2.0",
+            "sourcePath": "manifests/service-manifest.json",
+            "targetPath": "manifests/orderitemcreate-schema-manifest.json"
+          }
+        },
+        "classes": "type-schemas"
+      },
+      {
+        "data": {
+          "id": "4f1d6a53e66a711b",
+          "source": "c0eeb7a24745f456",
+          "target": "2a4a429184e80c1e",
+          "type": "schemas",
+          "label": "Schemas",
+          "metadata": {
+            "relationship": "schemas",
+            "sourceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/orderlistresponse@1.2.0",
+            "sourcePath": "manifests/service-manifest.json",
+            "targetPath": "manifests/orderlistresponse-schema-manifest.json"
+          }
+        },
+        "classes": "type-schemas"
+      },
+      {
+        "data": {
+          "id": "825dfa946dca6809",
+          "source": "c0eeb7a24745f456",
+          "target": "c348224ec10af548",
+          "type": "schemas",
+          "label": "Schemas",
+          "metadata": {
+            "relationship": "schemas",
+            "sourceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/address@1.2.0",
+            "sourcePath": "manifests/service-manifest.json",
+            "targetPath": "manifests/address-schema-manifest.json"
+          }
+        },
+        "classes": "type-schemas"
+      },
+      {
+        "data": {
+          "id": "3bdc451b89fc631b",
+          "source": "c0eeb7a24745f456",
+          "target": "10d02e5202eff689",
+          "type": "schemas",
+          "label": "Schemas",
+          "metadata": {
+            "relationship": "schemas",
+            "sourceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/paymentmethod@1.2.0",
+            "sourcePath": "manifests/service-manifest.json",
+            "targetPath": "manifests/paymentmethod-schema-manifest.json"
+          }
+        },
+        "classes": "type-schemas"
+      },
+      {
+        "data": {
+          "id": "d53d4f35b4ef96f4",
+          "source": "c0eeb7a24745f456",
+          "target": "2d8dc2fc2067decc",
+          "type": "schemas",
+          "label": "Schemas",
+          "metadata": {
+            "relationship": "schemas",
+            "sourceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+            "targetUrn": "urn:proto:data:commerce-orders-api/schema/problem@1.2.0",
+            "sourcePath": "manifests/service-manifest.json",
+            "targetPath": "manifests/problem-schema-manifest.json"
+          }
+        },
+        "classes": "type-schemas"
+      }
+    ]
+  },
+  "style": [
+    {
+      "selector": "node",
+      "style": {
+        "background-color": "#E6F4F1",
+        "border-color": "#0B7285",
+        "border-width": 2,
+        "border-style": "solid",
+        "label": "data(label)",
+        "color": "#1F2933",
+        "font-size": 14,
+        "font-weight": 500,
+        "text-halign": "center",
+        "text-valign": "center",
+        "text-wrap": "wrap",
+        "text-max-width": 160,
+        "padding": "12px",
+        "shape": "round-rectangle"
+      }
+    },
+    {
+      "selector": "node[type = \"protocol\"]",
+      "style": {
+        "background-color": "#EBF4FF",
+        "border-color": "#1D4ED8"
+      }
+    },
+    {
+      "selector": "node[type = \"service\"]",
+      "style": {
+        "background-color": "#F0F9FF",
+        "border-color": "#0EA5E9"
+      }
+    },
+    {
+      "selector": "node[type = \"dataset\"]",
+      "style": {
+        "background-color": "#FEF3C7",
+        "border-color": "#D97706"
+      }
+    },
+    {
+      "selector": "node[type = \"external\"]",
+      "style": {
+        "background-color": "#F9FAFB",
+        "border-color": "#94A3B8",
+        "border-style": "dashed",
+        "line-style": "dashed",
+        "color": "#475569"
+      }
+    },
+    {
+      "selector": "node[type = \"workflow\"]",
+      "style": {
+        "background-color": "#FDF2F8",
+        "border-color": "#DB2777",
+        "shape": "hexagon"
+      }
+    },
+    {
+      "selector": "node[type = \"agent\"]",
+      "style": {
+        "background-color": "#ECFDF5",
+        "border-color": "#059669",
+        "shape": "ellipse"
+      }
+    },
+    {
+      "selector": "node[domain = \"core\"]",
+      "style": {
+        "background-color": "#DCFCE7",
+        "border-color": "#15803D"
+      }
+    },
+    {
+      "selector": "node[domain = \"platform\"]",
+      "style": {
+        "background-color": "#E0F2FE",
+        "border-color": "#0284C7"
+      }
+    },
+    {
+      "selector": "node[domain = \"governance\"]",
+      "style": {
+        "background-color": "#F3E8FF",
+        "border-color": "#7C3AED"
+      }
+    },
+    {
+      "selector": "edge",
+      "style": {
+        "curve-style": "bezier",
+        "width": 2,
+        "line-color": "#0B7285",
+        "target-arrow-shape": "triangle",
+        "target-arrow-color": "#0B7285",
+        "arrow-scale": 1,
+        "label": "data(label)",
+        "font-size": 11,
+        "color": "#0F172A",
+        "text-wrap": "wrap",
+        "text-margin-y": -10
+      }
+    },
+    {
+      "selector": "edge[type = \"consumes\"]",
+      "style": {
+        "line-style": "dashed",
+        "line-color": "#16A34A",
+        "target-arrow-color": "#16A34A"
+      }
+    },
+    {
+      "selector": "edge[type = \"publishes\"]",
+      "style": {
+        "line-color": "#0EA5E9",
+        "target-arrow-color": "#0EA5E9",
+        "target-arrow-shape": "triangle-backcurve"
+      }
+    },
+    {
+      "selector": "edge[type = \"depends_on\"]",
+      "style": {
+        "line-style": "solid",
+        "line-color": "#1D4ED8",
+        "target-arrow-color": "#1D4ED8"
+      }
+    }
+  ],
+  "layout": {
+    "name": "cola",
+    "maxSimulationTime": 4000,
+    "refresh": 1,
+    "animate": false,
+    "fit": true,
+    "padding": 40,
+    "edgeElasticity": 100,
+    "nodeSpacing": 30
+  },
+  "warnings": [
+    "No Cytoscape style entry for node type \"data\". Using base node styling.",
+    "No Cytoscape style entry for domain \"data\". Using theme defaults.",
+    "No Cytoscape style entry for node type \"api\". Using base node styling.",
+    "No Cytoscape style entry for domain \"api\". Using theme defaults.",
+    "No Cytoscape style entry for domain \"external\". Using theme defaults.",
+    "No Cytoscape edge style for type \"consumers\". Using default edge styling.",
+    "No Cytoscape edge style for type \"dependencies\". Using default edge styling.",
+    "No Cytoscape edge style for type \"schemas\". Using default edge styling."
+  ]
+}

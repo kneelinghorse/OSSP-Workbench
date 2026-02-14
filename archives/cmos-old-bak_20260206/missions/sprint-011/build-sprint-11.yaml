@@ -1,0 +1,435 @@
+Here’s a concise review of where things stand and a focused Sprint 11 plan tailored for internal refinement (not commercialization).
+
+# pack.yaml - Metadata for the "Implementation" Domain Pack
+name: "Build.Implementation.v1"
+version: "1.0.0"
+displayName: "Implementation Mission"
+description: "A mission to implement a specific, well-scoped technical component based on the findings of a prior research mission. Sized for a single, focused development session."
+author: "OSSP AGI"
+schema: "./schemas/Implementation.v1.json"
+
+---
+
+# Mission File: B11.1_Architecture_Separation.yaml
+missionId: "BI-20251010-B11.1"
+objective: "Enforce a clean boundary between protocol contracts and runtime/tooling by relocating code and updating imports so that /app is the only build root."
+context: |
+  We currently mix pure protocol modules (schemas/validators/diff) and runtime adapters (CLI, MCP, A2A, workflow exec).
+  This causes import ambiguity and slows iteration. The outcome is a clearly separated code structure while preserving test
+  coverage and keeping /app as the single build root and docker context.
+
+successCriteria:
+  - "All protocol contract code lives under /app/packages/protocols/** with no direct I/O."
+  - "All runtime/adapters/CLI live under /app/packages/runtime/**."
+  - "All unit/integration tests pass; imports resolve with no cross-layer violations."
+  - "CI builds and tests execute only from /app; Docker builds from /app/Dockerfile."
+
+deliverables:
+  - "Updated folder layout and imports across /app."
+  - "Cross-layer lint rule or check to prevent protocols→runtime coupling."
+  - "Passing test suite and green CI."
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "/app is the single build root; Dockerfile must be /app/Dockerfile."
+      sourceMission: "CurrentState-20251010"
+    - finding: "Graph + validators interact generically by URN; contracts are pure."
+      sourceMission: "S10-Validation-Notes"
+  implementationScope:
+    coreDeliverable: >
+      Move protocol contracts to /app/packages/protocols; move runtime/adapters/CLI to /app/packages/runtime.
+      Add an eslint rule or simple script check to forbid imports from runtime into protocols.
+    outOfScope:
+      - "Build pipeline redesign beyond path changes."
+      - "Public API surface changes."
+  validationProtocol:
+    - validator: "Claude"
+      focus: "Import graph sanity across packages; no cross-layer leaks."
+    - validator: "Gemini"
+      focus: "Folder structure and lint rule effectiveness."
+  handoffContext:
+    completed:
+      - "Contracts separated from runtime."
+      - "Build/test paths updated to /app."
+    interfaces:
+      - "Package boundaries: protocols (pure), runtime (I/O/adapters/CLI)."
+    assumptions:
+      - "No circular deps between packages."
+    nextMission: "BI-20251010-B11.5"
+    blockers: []
+
+---
+
+# Mission File: B11.2_Workflow_Service_Adapters.yaml
+missionId: "BI-20251010-B11.2"
+objective: "Replace the workflow service stub with production-ready adapters (HTTP, Event, Tool) and a lightweight simulate runner."
+context: |
+  Workflow execution currently relies on a stub; agents and tests need real adapters. Provide a small adapter registry,
+  concrete adapter implementations, and a simulate runner for local diagnosis. Keep code within /app.
+
+successCriteria:
+  - "HTTP/Event/Tool adapters implemented with input validation and error propagation."
+  - "Adapter registry resolves by kind; simulate runner executes a 3-step sample workflow end-to-end."
+  - "≥95% line coverage on adapters + registry."
+  - "Integration tests pass in CI."
+
+deliverables:
+  - "/app/src/workflow/types.{ts|js}: shared adapter contracts."
+  - "/app/src/workflow/adapters/{httpAdapter,eventAdapter,toolAdapter}.{ts|js}"
+  - "/app/src/workflow/adapter-registry.{ts|js}"
+  - "/app/bin/workflow-run.{js|ts} (node shebang)"
+  - "Tests under /app/tests/workflow/** and /app/tests/integration/**"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Adapters: HTTP requests, Event emit, Tool invocation via runtime tool registry."
+      sourceMission: "S10-Agent-Runtime"
+    - finding: "Keep simulate runner minimal; stdout is sufficient."
+      sourceMission: "DX-Guidelines-2025"
+  implementationScope:
+    coreDeliverable: >
+      Adapter interfaces + three implementations + registry + simulate runner. Provide one example JSON workflow
+      under /app/examples/workflows/ping.json to validate flow locally.
+    outOfScope:
+      - "Long-running orchestration/queues."
+      - "Auth/session management beyond headers option."
+  validationProtocol:
+    - validator: "Claude"
+      focus: "I/O correctness and failure modes in adapters."
+    - validator: "Gemini"
+      focus: "Test completeness and coverage."
+  handoffContext:
+    completed:
+      - "HTTP/Event/Tool adapters wired and tested."
+      - "CLI runner executes example workflow."
+    interfaces:
+      - "function getAdapter(kind): WorkflowAdapter"
+      - "bin: workflow-run --file <path> --trace <id>"
+    assumptions:
+      - "node-fetch or native fetch available in environment."
+    nextMission: "BI-20251010-B11.8"
+    blockers: []
+
+---
+
+# Mission File: B11.3_CICD_Consolidation_DockerFix.yaml
+missionId: "BI-20251010-B11.3"
+objective: "Consolidate CI jobs and enforce /app-only build context; fix Docker pathing."
+context: |
+  CI previously referenced the repo root. We must run all Node steps in /app and build Docker with
+  context ./app and file /app/Dockerfile. Keep pipeline under 5 minutes.
+
+successCriteria:
+  - "GitHub Actions uses working-directory: app for install/test/build."
+  - "Docker step runs docker build -f app/Dockerfile ./app successfully."
+  - "Single consolidated pipeline is green; total time ≤ 5m."
+
+deliverables:
+  - ".github/workflows/ci.yml updates."
+  - "/app/.dockerignore tuned for small context."
+  - "Optional: /app/README-ci.md with runbook."
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Do not publish or build from repo root; only /app."
+      sourceMission: "CurrentState-20251010"
+    - finding: "Performance target: CI ≤ 5m."
+      sourceMission: "SLO-Internal"
+  implementationScope:
+    coreDeliverable: >
+      Update CI to run npm ci/test/build in /app, then docker build from /app. Confirm cache keys use app/package-lock.json.
+    outOfScope:
+      - "Release tagging or docker push."
+  validationProtocol:
+    - validator: "Gemini"
+      focus: "Pipeline efficiency/time budget."
+    - validator: "Claude"
+      focus: "Correct build contexts and artifacts."
+  handoffContext:
+    completed:
+      - "Green CI with /app-only scope."
+    interfaces:
+      - "ci.yml jobs: build_test, docker_image"
+    assumptions:
+      - "Docker available on runner."
+    nextMission: "BI-20251010-B11.7"
+    blockers: []
+
+---
+
+# Mission File: B11.4_Catalog_Snapshot_Workspaces.yaml
+missionId: "BI-20251010-B11.4"
+objective: "Add catalog export/import (snapshot) and multi-workspace offline validation."
+context: |
+  Teams need to freeze, share, and restore protocol catalogs. Provide a JSON snapshot schema, CLI export/import,
+  and an --offline validation mode that uses only local manifests.
+
+successCriteria:
+  - "Export of current workspace produces a valid JSON against snapshot schema."
+  - "Import into a new workspace restores manifests and relationships."
+  - "--offline validation runs with zero network/project-root access."
+
+deliverables:
+  - "/app/schemas/catalog-snapshot.schema.json"
+  - "/app/cli/commands/catalog-export.{ts|js}"
+  - "/app/cli/commands/catalog-import.{ts|js}"
+  - "Support --offline in /app/cli/index.{ts|js}"
+  - "Example: /app/examples/snapshots/ws-default.json"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Graph/validators operate generically by URN."
+      sourceMission: "S10-Validation-Notes"
+    - finding: "Workspaces need isolation for experimentation."
+      sourceMission: "DX-Guidelines-2025"
+  implementationScope:
+    coreDeliverable: >
+      CLI export/import subcommands; snapshot schema versioned at 1.0.0; workspace flag (--workspace) and --offline mode
+      toggling external importers.
+    outOfScope:
+      - "Remote registry sync."
+  validationProtocol:
+    - validator: "Claude"
+      focus: "Schema validity and round-trip fidelity."
+    - validator: "Gemini"
+      focus: "Error handling (conflicts, dupes)."
+  handoffContext:
+    completed:
+      - "Snapshot round-trip verified."
+    interfaces:
+      - "cli: catalog:export --out <file>"
+      - "cli: catalog:import --in <file> --workspace <name>"
+    assumptions:
+      - "Snapshots are self-contained (no binary blobs)."
+    nextMission: "BI-20251010-B11.9"
+    blockers: []
+
+---
+
+# Mission File: B11.5_Protocol_Authoring_UX_v2.yaml
+missionId: "BI-20251010-B11.5"
+objective: "Enhance authoring experience with a guided CLI wizard, improved scaffolds, and live manifest validation."
+context: |
+  Protocol authors need lower friction and clearer errors. Provide an interactive CLI flow to create protocol
+  manifests, generate richer scaffolds, and run real-time checks.
+
+successCriteria:
+  - "Wizard can produce a valid manifest in <2 minutes (happy path)."
+  - "Scaffold templates reduce TODOs by ≥50% vs current."
+  - "Validation errors include actionable hints."
+
+deliverables:
+  - "/app/cli/commands/protocol-init.{ts|js}"
+  - "Scaffold templates under /app/templates/protocols/**"
+  - "Validation hook in wizard using existing validators."
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Existing scaffolds are intentionally minimal; authors need better defaults."
+      sourceMission: "S10-Scaffold-Notes"
+  implementationScope:
+    coreDeliverable: >
+      A prompt-driven wizard that writes a manifest + starter tests; integrates validation and prints fix tips.
+    outOfScope:
+      - "GUI tooling."
+  validationProtocol:
+    - validator: "Gemini"
+      focus: "UX flow time-to-first-manifest."
+    - validator: "Claude"
+      focus: "Validation hint quality."
+  handoffContext:
+    completed:
+      - "Wizard generates validated manifests and tests."
+    interfaces:
+      - "cli: protocol:init --type <name> --out <dir>"
+    assumptions:
+      - "Author runs from /app."
+    nextMission: "BI-20251010-B11.6"
+    blockers: []
+
+---
+
+# Mission File: B11.6_Governance_Versioning_Guardrails.yaml
+missionId: "BI-20251010-B11.6"
+objective: "Detect and gate breaking changes to protocol artifacts via CLI diff, pre-commit hook, and PR annotations."
+context: |
+  We need consistent governance to prevent silent breaks in protocol contracts. Add a semantic diff tool,
+  hooks to block violating commits, and basic PR annotations.
+
+successCriteria:
+  - "CLI diff flags breaking changes (removed fields, type changes, new requireds)."
+  - "Pre-commit hook blocks breaking changes unless migration file present."
+  - "PR shows summary annotation of detected issues."
+
+deliverables:
+  - "/app/cli/commands/protocol-diff.{ts|js}"
+  - "/app/scripts/hooks/pre-commit (or Husky config)"
+  - "/app/docs/migrations/MIGRATION_TEMPLATE.md"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Common breaking patterns: removed props, type narrowing, required flips."
+      sourceMission: "S10-Diff-Engine"
+  implementationScope:
+    coreDeliverable: >
+      Implement diff semantics over two manifests; exit non-zero on breaking unless --allow-breaking or migration present.
+      Provide PR summary (GitHub Actions step) when on CI.
+    outOfScope:
+      - "Full semantic versioning automation."
+  validationProtocol:
+    - validator: "Claude"
+      focus: "Correct breaking-change detection."
+    - validator: "Gemini"
+      focus: "Developer ergonomics of hooks."
+  handoffContext:
+    completed:
+      - "Governance checks wired locally and in CI."
+    interfaces:
+      - "cli: protocol:diff --old <file|ref> --new <file|ref>"
+    assumptions:
+      - "Simple JSON/YAML inputs for manifests."
+    nextMission: "BI-20251010-B11.9"
+    blockers: []
+
+---
+
+# Mission File: B11.7_Security_Policy_Guardrails.yaml
+missionId: "BI-20251010-B11.7"
+objective: "Expand CI security to include secret/PII scanning and license compliance; set safe logging defaults."
+context: |
+  npm audit is insufficient. Add scanners for secrets/PII and licenses, and ensure logger redacts sensitive fields.
+  Keep all changes scoped to /app and CI.
+
+successCriteria:
+  - "CI fails on discovered secrets or disallowed licenses."
+  - "Default logger redacts tokens, keys, and PII by key name pattern."
+  - "Documented allowlists/overrides."
+
+deliverables:
+  - "CI step additions in .github/workflows/ci.yml"
+  - "/app/src/lib/logger.{ts|js} with redaction"
+  - "/app/policies/licenses-allowlist.json"
+  - "/app/policies/secrets-patterns.json"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Secret and license drift occur during rapid iteration."
+      sourceMission: "S10-Postmortems"
+  implementationScope:
+    coreDeliverable: >
+      Integrate a reputable secret/PII scanner and a license audit step; minimal config files; redact by default.
+    outOfScope:
+      - "Runtime DLP or centralized secret rotation."
+  validationProtocol:
+    - validator: "Gemini"
+      focus: "Scanner coverage and FP/FN balance."
+    - validator: "Claude"
+      focus: "Logger redaction completeness."
+  handoffContext:
+    completed:
+      - "Security gates active in CI."
+    interfaces:
+      - "logger.redact(object) and logger.info/error()"
+    assumptions:
+      - "Open-source dependencies provide SPDX license data."
+    nextMission: "BI-20251010-B11.8"
+    blockers: []
+
+---
+
+# Mission File: B11.8_Observability_for_Developers.yaml
+missionId: "BI-20251010-B11.8"
+objective: "Provide local perf/status summaries, correlation IDs, and trace toggles to speed diagnosis."
+context: |
+  Developers need fast insight into failures and regressions. Add a succinct perf status summary, structured logs
+  with correlation IDs, and env toggles to enable lightweight tracing.
+
+successCriteria:
+  - "ossp perf status summary command prints key timings (discovery p95, MCP p95)."
+  - "Correlation IDs appear across adapter and CLI logs."
+  - "Trace toggles (env flags) can be enabled per run."
+
+deliverables:
+  - "/app/cli/commands/perf-status.{ts|js}"
+  - "Correlation ID middleware/util under /app/src/lib/trace.{ts|js}"
+  - "Env flags documented in /app/docs/dev/observability.md"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Perf SLOs: discovery p95 < 1s, MCP p95 < 3s."
+      sourceMission: "SLO-Internal"
+  implementationScope:
+    coreDeliverable: >
+      A CLI summary command that reads existing metrics and prints a compact report; add correlationId() util; honor
+      TRACE=1 or TRACE=adapters env for verbose traces.
+    outOfScope:
+      - "External tracing backends."
+  validationProtocol:
+    - validator: "Claude"
+      focus: "Report correctness and usefulness."
+    - validator: "Gemini"
+      focus: "Toggle behavior and noise levels."
+  handoffContext:
+    completed:
+      - "Local observability primitives available."
+    interfaces:
+      - "cli: perf:status"
+      - "trace.correlationId()"
+    assumptions:
+      - "Metrics exist or can be derived from logs."
+    nextMission: "BI-20251010-B11.9"
+    blockers: []
+
+---
+
+# Mission File: B11.9_Test_Quality_Flake_Reduction.yaml
+missionId: "BI-20251010-B11.9"
+objective: "Reduce test flakiness and add property/fuzz/negative coverage for hot paths."
+context: |
+  Intermittent failures slow delivery. Add property-based/fuzz tests to adapters/catalog ops and curate a small
+  deflake harness. Include negative tests for governance checks.
+
+successCriteria:
+  - "Measured flake rate < 1% over 10 consecutive CI runs."
+  - "Property/fuzz tests present for workflow adapters and catalog import."
+  - "Negative tests cover breaking-change gates."
+
+deliverables:
+  - "/app/tests/util/deflake.{ts|js}"
+  - "Property/fuzz tests under /app/tests/property/**"
+  - "Negative governance tests under /app/tests/governance/**"
+  - "CI job that repeats a focused suite N times on PR label (optional)."
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Adapters and catalog ops are current hot paths."
+      sourceMission: "S10-Coverage-Report"
+  implementationScope:
+    coreDeliverable: >
+      Introduce a small deflake harness; add generators for adapter inputs; add negative cases where protocol-diff
+      must fail without migrations.
+    outOfScope:
+      - "Full fuzzing infra at scale."
+  validationProtocol:
+    - validator: "Gemini"
+      focus: "Statistical reduction of flakes."
+    - validator: "Claude"
+      focus: "Edge-case breadth."
+  handoffContext:
+    completed:
+      - "Stable, higher-signal CI results."
+    interfaces:
+      - "npm run test:deflake (optional script)"
+    assumptions:
+      - "Node 20+ in CI."
+    nextMission: ""
+    blockers: []

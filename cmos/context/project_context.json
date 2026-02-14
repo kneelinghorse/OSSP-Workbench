@@ -1,0 +1,93 @@
+{
+  "working_memory": {
+    "active_mission": null,
+    "session_count": 7,
+    "last_completed_mission": "s3-m05",
+    "last_completed_sprint": "sprint-3",
+    "current_sprint": "sprint-3",
+    "session_history": [
+      {
+        "id": "PS-2026-02-08-001",
+        "type": "review",
+        "title": "Sprint 11-12 Comprehensive Review & DB Hygiene",
+        "outcome": "Identified DB drift, empty master context, stale missions"
+      },
+      {
+        "id": "PS-2026-02-09-001",
+        "type": "research",
+        "title": "S1-M04 Archive Reconciliation & History Restoration",
+        "outcome": "Recovered 12 sprints of history, 5 strategic decisions, sprint metadata"
+      },
+      {
+        "id": "PS-2026-02-09-002",
+        "type": "review",
+        "title": "Sprint 1 Review",
+        "outcome": "Sprint 1 completed 5/5, GO decision, context gaps identified"
+      },
+      {
+        "id": "PS-2026-02-11-001",
+        "type": "review",
+        "title": "Sprint 2 Review",
+        "outcome": "Sprint 2 completed 4/4, ESM/CJS fix biggest lever (53.6% → 87.4%), catalog extended to 6 types"
+      },
+      {
+        "id": "PS-2026-02-11-002",
+        "type": "planning",
+        "title": "Sprint 3 Planning",
+        "outcome": "5 missions planned with dependency graph, targeting 90%+ pass rate, 2 demos, README quickstart"
+      },
+      {
+        "id": "PS-2026-02-12-001",
+        "type": "review",
+        "title": "Sprint 3 validation closeout",
+        "outcome": "All metrics validated: 100% pass rate, both demos pass, README verified"
+      },
+      {
+        "id": "PS-2026-02-13-001",
+        "type": "review",
+        "title": "Sprint 3 Review: Practical Utility & Quality Gate",
+        "outcome": "Full review completed with 10 captures, sprint marked complete, context updated"
+      }
+    ]
+  },
+  "context_health": {
+    "agents_md_loaded": true,
+    "last_updated": "2026-02-13T00:25:00Z",
+    "master_context_seeded": true,
+    "decision_tracking": "active"
+  },
+  "technical_context": {
+    "codebase_health": {
+      "test_suites_total": 114,
+      "test_suites_passing": 113,
+      "test_suites_skipped": 1,
+      "test_suites_failing": 0,
+      "individual_tests_passing": 2027,
+      "individual_tests_skipped": 2,
+      "individual_tests_total": 2029,
+      "suite_pass_rate": "100.0%",
+      "test_pass_rate": "100.0%"
+    },
+    "key_paths": {
+      "protocols": "packages/protocols/src/",
+      "runtime": "packages/runtime/",
+      "catalog": "packages/protocols/src/catalog/",
+      "importers": "packages/runtime/importers/",
+      "generators": "packages/runtime/generators/",
+      "visualization": "src/visualization/",
+      "cli": "packages/runtime/cli/",
+      "mcp": "packages/runtime/mcp/",
+      "demos": "examples/demos/"
+    },
+    "reference_docs": [
+      "cmos/foundational-docs/roadmap.md",
+      "cmos/foundational-docs/technical-architecture.md",
+      "cmos/foundational-docs/runtime-overview.md"
+    ],
+    "working_demos": [
+      "npm run demo:openapi-viz (OpenAPI → Cytoscape JSON + DrawIO XML, 112ms)",
+      "npm run demo:asyncapi-consumer (AsyncAPI → Kafka consumer with governance, 1326ms)",
+      "PostgreSQL schema introspection → data manifest"
+    ]
+  }
+}

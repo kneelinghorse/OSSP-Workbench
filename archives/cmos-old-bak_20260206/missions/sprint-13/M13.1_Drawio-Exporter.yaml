@@ -1,0 +1,81 @@
+name: "Build.Implementation.v1"
+version: "1.0.0"
+displayName: "Implementation Mission"
+
+missionId: "M13.1-20251013"
+objective: >
+  Implement an automated Draw.io (diagrams.net) exporter that converts the canonical catalog graph
+  into a native .drawio (mxGraphModel XML) diagram. Provide a developer-facing JSON→XML pipeline,
+  tests, and guardrails so artifacts are reliable and portable.
+
+context: |
+  This mission replaces Mermaid with Draw.io as the primary visualization target and codifies the
+  two-stage pipeline: Catalog → Canonical JSON Graph → Draw.io XML (mxGraphModel).
+  Source research (read before building):
+    - /missions/research/r.13.1_Draw.io Diagrams_specs.md  :contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}
+    - /missions/research/r.13.2_unified-graph-schema.md    :contentReference[oaicite:2]{index=2}
+    - /missions/research/r.13.4_Draw.io-Performance-and-Scaling.md :contentReference[oaicite:3]{index=3}
+
+successCriteria:
+  - "Given a valid canonical graph JSON, exporter produces a .drawio file that opens in diagrams.net with correct shapes/edges."
+  - "Visual grammar applied: protocol types, relationships, and domain colors render as specified in R13.1."
+  - "CLI smoke test generates artifact to /app/artifacts/diagrams/ with timestamped name; --output overrides path."
+  - "Unit/integration tests cover JSON→XML serializer and reject malformed inputs with actionable errors."
+
+deliverables:
+  - "/app/src/visualization/drawio/exporter.ts            # JSON→mxGraphModel XML serializer (pure)"
+  - "/app/src/visualization/drawio/styles.json            # domain/type → shape/color map (externalized config)"
+  - "/app/cli/commands/catalog-generate-diagram.ts        # thin command wrapper (consumes exporter)"
+  - "/app/tests/visualization/drawio/exporter.test.ts     # unit tests (serializer, style application)"
+  - "/app/tests/visualization/drawio/smoke.test.ts        # opens minimal graph (no GUI), validates XML structure"
+  - "/app/artifacts/diagrams/ (created on demand)"
+  - "/app/docs/dev/drawio-visualization.md                # end-user guide (how to generate/open), not in repo root"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Draw.io native, editable format is mxGraphModel XML; use a two-stage JSON→XML pipeline."
+      source: "/missions/research/r.13.1_Draw.io Diagrams_specs.md"  :contentReference[oaicite:4]{index=4}
+    - finding: "Canonical node/edge schema decouples data from presentation."
+      source: "/missions/research/r.13.2_unified-graph-schema.md"    :contentReference[oaicite:5]{index=5}
+  implementationScope:
+    coreDeliverable: >
+      1) Define a canonical TS type for the catalog graph (import from M13.2 output).
+      2) Implement pure serializer that creates the minimal required XML scaffold (mxfile/diagram/mxGraphModel/root, cells id=0,1),
+         then emits vertex/edge <mxCell> with geometry and style serialization (key=value;).
+      3) Externalize style mapping (type/domain→shape/color/connector).
+      4) Command wrapper handles file naming, --output path, and --overwrite safety.
+    outOfScope:
+      - "Interactive browser viewer; focus on file generation only."
+      - "Multi-page or layered decomposition (see M13.4)."
+  plan:
+    - id: types
+      description: "Import/define Graph types shared with M13.2; strict runtime validation (zod/ajv) for input."
+    - id: serializer
+      description: "JSON→XML writer with xmlbuilder2; style serialization; minimal geometry; deterministic IDs."
+    - id: cli-wrapper
+      description: "catalog generate-diagram (wired in M13.3) invokes exporter; timestamped filename if no -o."
+    - id: tests
+      description: "Fixture graph (3–5 nodes) → exact XML assertions; failing cases: missing ids, cycles, unknown shape keys."
+  validationProtocol:
+    - validator: "Local"
+      focus: "Generate sample .drawio; open in diagrams.net; verify labels, arrows, colors."
+    - validator: "CI-fast"
+      focus: "Unit + smoke tests pass; artifact path printed; no writes outside /app."
+  handoffContext:
+    completed:
+      - "Stable exporter with tests and guide."
+    interfaces:
+      - "app-cli catalog generate-diagram [-o <path>] [--overwrite]"
+    assumptions:
+      - "Node 20+; xmlbuilder2 available."
+    nextMission: "M13.2-20251013"
+    blockers: []
+outcome:
+  status: "Completed"
+  summary: "Draw.io exporter, CLI entry point, style map, smoke/unit tests, and developer docs delivered."
+  artifacts:
+    - "/app/src/visualization/drawio/exporter.{js,ts}"
+    - "/app/cli/commands/catalog-generate-diagram.{js,ts}"
+    - "/app/tests/visualization/drawio/*.test.ts"
+    - "/app/docs/dev/drawio-visualization.md"

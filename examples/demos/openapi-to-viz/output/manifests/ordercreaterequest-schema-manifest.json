@@ -1,0 +1,46 @@
+{
+  "urn": "urn:proto:data:commerce-orders-api/schema/ordercreaterequest@1.2.0",
+  "metadata": {
+    "kind": "data",
+    "name": "OrderCreateRequest Schema",
+    "version": "1.2.0",
+    "status": "derived",
+    "description": "Schema extracted from OpenAPI component: OrderCreateRequest",
+    "tags": [
+      "openapi",
+      "schema",
+      "demo"
+    ]
+  },
+  "schema": {
+    "name": "OrderCreateRequest",
+    "source": "openapi-component",
+    "ownerServiceUrn": "urn:proto:api:commerce-orders-api/service@1.2.0",
+    "definition": {
+      "type": "object",
+      "required": [
+        "customerId",
+        "items"
+      ],
+      "properties": {
+        "customerId": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/OrderItemCreate"
+          }
+        }
+      }
+    }
+  },
+  "relationships": {
+    "dependencies": [
+      "urn:proto:data:commerce-orders-api/schema/orderitemcreate@1.2.0"
+    ],
+    "consumers": [
+      "urn:proto:api:commerce-orders-api/service@1.2.0"
+    ]
+  }
+}

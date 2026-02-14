@@ -1,0 +1,73 @@
+{
+  "catalog": {
+    "name": "ossp_demo",
+    "type": "database",
+    "platform": "postgresql"
+  },
+  "datasets": [
+    {
+      "dataset": {
+        "name": "ossp_demo.customers",
+        "type": "dimension",
+        "lifecycle": {
+          "status": "active"
+        },
+        "urn": "urn:proto:data:postgres/ossp_demo.customers"
+      },
+      "schema": {
+        "primary_key": [
+          "id"
+        ],
+        "fields": {
+          "id": {
+            "type": "integer",
+            "required": true,
+            "urn": "urn:proto:data:postgres/undefined.undefined.id"
+          },
+          "email": {
+            "type": "string",
+            "required": true,
+            "pii": true,
+            "pii_type": "email",
+            "urn": "urn:proto:data:postgres/undefined.undefined.email"
+          },
+          "full_name": {
+            "type": "string",
+            "required": false,
+            "urn": "urn:proto:data:postgres/undefined.undefined.full_name"
+          },
+          "phone": {
+            "type": "string",
+            "required": false,
+            "urn": "urn:proto:data:postgres/undefined.undefined.phone"
+          }
+        }
+      },
+      "quality": {
+        "row_count_estimate": "-1"
+      },
+      "metadata": {
+        "source": {
+          "type": "postgres",
+          "schema": "ossp_demo",
+          "table": "customers"
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "status": "draft",
+    "source": {
+      "type": "postgres",
+      "database": "postgres",
+      "schema": "ossp_demo",
+      "imported_at": "2026-02-12T04:56:17.838Z"
+    }
+  },
+  "provenance": {
+    "importer": "PostgresImporter",
+    "importer_version": "0.1.0",
+    "imported_at": "2026-02-12T04:56:17.838Z",
+    "connection_hash": "4d23a8d1b0b648e8"
+  }
+}

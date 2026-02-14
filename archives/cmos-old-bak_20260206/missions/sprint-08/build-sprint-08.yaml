@@ -1,0 +1,338 @@
+# Sprint 08 - Build Missions: Runtime Integration & Agent Enablement
+# Replace stubs, wire real A2A/MCP clients, publish capability manifests,
+# add discovery/URN resolution, and prove multi-agent execution end-to-end.
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-08-b1-a2a-client
+  name: A2A HTTP Client (replace stub)
+  domain: build.runtime
+  priority: critical
+  estimatedHours: 6
+  dependencies: []
+spec:
+  objective: >
+    Implement a production A2A HTTP client to replace stubs, enabling authenticated,
+    delegated, retry-capable requests between agents.
+  context: >
+    Current runtime uses stubs for agent-to-agent (A2A) calls; real HTTP JSON transport
+    with auth, delegation, retries, and timeouts is required for operational use.
+  technicalRequirements:
+    - API: request<T>(targetUrn, route, init) -> Promise<{status, headers, data}>
+    - Auth: Bearer token provider; Delegation header (x-agent-delegation)
+    - Resilience: exponential backoff with jitter for 429/5xx; configurable maxRetries
+    - Timeouts: per-request timeout + cancellation; no dangling handles
+    - Errors: typed (AuthError | TimeoutError | A2AError) with cause/status
+    - Logging: structured debug (reqId, attempt, latency)
+  implementation:
+    inputSources:
+      - Current runtime stub behavior and call sites
+      - Internal HTTP conventions used elsewhere in repo
+    coreComponents:
+      - Runtime A2A client module
+      - A2A auth/headers helper
+      - Unit + local integration tests (mock agent)
+    keyAlgorithms:
+      - Exponential backoff with full jitter
+      - Abort/timeout guard and error mapping by status class
+  acceptanceCriteria:
+    - Auth header applied when token available; delegation header optional/controlled
+    - Retries occur on 429/503; maxRetries respected; final error typed
+    - Local p50 successful request < 200ms (baseline)
+    - Tests: success, 401/403, 429 retry, 5xx retry, timeout paths
+  deliverables:
+    - Implemented A2A client + tests
+    - Short runtime README section (env vars, common failures)
+  constraints:
+    - Use platform HTTP (fetch/undici); no heavy external HTTP libs
+    - Keep framework-agnostic for CLI/server reuse
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-08-b2-mcp-client
+  name: MCP Client Integration (execute real tools)
+  domain: build.runtime
+  priority: critical
+  estimatedHours: 6
+  dependencies:
+    - sprint-08-b1-a2a-client
+spec:
+  objective: >
+    Implement an MCP client that can list tools, fetch schemas, and execute tools with
+    connection lifecycle, timeouts/cancellation, and typed errors.
+  context: >
+    Agents must invoke real tools via MCP instead of stubs; stability requires pooling,
+    heartbeat, cancellation, and solid error handling.
+  technicalRequirements:
+    - API: open(endpoint), close(), listTools(), getToolSchema(urn), executeTool(urn,input,opts)
+    - Lifecycle: connection pooling, heartbeat/ping, graceful close on failure
+    - Timeouts: per-exec timeout + cancellation token
+    - Errors: typed (McpError | TimeoutError) with URN/tool context
+    - Compatibility: works against current MCP server and ≥3 protocol tools
+  implementation:
+    inputSources:
+      - Active MCP server tool registry
+      - Existing tool schemas/contracts
+    coreComponents:
+      - MCP client module + types
+      - Unit + integration tests invoking real tools
+    keyAlgorithms:
+      - Connection health checks/keepalive
+      - Pre/post schema validation against tool I/O
+  acceptanceCriteria:
+    - listTools() returns registered tools; getToolSchema() resolves
+    - executeTool() succeeds for ≥3 real tools; cancellation returns typed error
+    - Connection failures isolated; resources freed on close()
+  deliverables:
+    - MCP client + tests
+    - Maintainer example script demonstrating tool execution
+  constraints:
+    - No vendor SDK lock-in; pure protocol usage
+    - No global singletons (multi-agent scenarios supported)
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-08-b3-acm
+  name: Agent Capability Manifest (ACM) & /.well-known
+  domain: build.agent
+  priority: critical
+  estimatedHours: 5
+  dependencies:
+    - sprint-08-b2-mcp-client
+spec:
+  objective: >
+    Define and publish the Agent Capability Manifest (ACM) and serve it at
+    /.well-known/agent.json to support discovery and verification.
+  context: >
+    Discovery/registration requires a canonical machine-readable capability document
+    per agent (URN, runtime, endpoints, tools with schema refs, auth, limits).
+  technicalRequirements:
+    - JSON Schema v1: { urn, version, runtime, endpoints, tools[], auth, limits, metadata }
+    - Generated from in-process registry at startup
+    - HTTP GET /.well-known/agent.json (Cache-Control: 60s, ETag)
+    - Validation tests against schema; acceptable to require restart for changes
+  implementation:
+    inputSources:
+      - Existing tool registry metadata
+    coreComponents:
+      - ACM JSON schema + generator
+      - HTTP route for /.well-known/agent.json
+      - Unit tests for schema compliance
+    keyAlgorithms:
+      - Deterministic manifest generation
+      - ETag computation for cache validation
+  acceptanceCriteria:
+    - ACM validates against schema and lists at least one executable tool
+    - /.well-known/agent.json served and cacheable; ETag changes on updates
+  deliverables:
+    - ACM schema + generator + endpoint + tests
+  constraints:
+    - Versioned schema IDs (v1); stable field names
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-08-b4-urn-discovery
+  name: URN Registry & Agent Discovery
+  domain: build.registry
+  priority: critical
+  estimatedHours: 5
+  dependencies:
+    - sprint-08-b3-acm
+spec:
+  objective: >
+    Implement URN → baseURL resolution and discovery by probing /.well-known/agent.json,
+    caching results with TTL/ETag and verifying tool executability.
+  context: >
+    Agents are referenced by URN; the runtime must deterministically resolve, validate,
+    and cache their capabilities before delegation/execution.
+  technicalRequirements:
+    - URN format support (e.g., urn:agent:<name>[:env])
+    - Resolution flow: registry lookup → probe /.well-known → validate ACM → cache
+    - Cache policy: TTL + ETag invalidation; negative-cache 404s briefly
+    - CLI: ossp agents list | show <urn> | verify <urn>
+  implementation:
+    inputSources:
+      - Registry bootstrap entries
+      - ACM schema/spec from B8.3
+    coreComponents:
+      - URN resolver + discovery library
+      - CLI commands + tests
+    keyAlgorithms:
+      - ETag/TTL caching with invalidation rules
+      - Verify flow: resolve → fetch ACM → validate → probe tool execution
+  acceptanceCriteria:
+    - verify <urn> only passes if ACM validates and ≥1 tool executes
+    - list shows cached/verified agents with last-checked timestamp
+  deliverables:
+    - Resolver/discovery libs + CLI + tests
+    - Minimal bootstrap registry config
+  constraints:
+    - Network failures return actionable errors (no stale silent cache)
+    - Injected cache for testability (no global mutable state)
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-08-b5-resilience
+  name: Runtime Error Handling & Resilience
+  domain: build.runtime
+  priority: high
+  estimatedHours: 4
+  dependencies:
+    - sprint-08-b1-a2a-client
+    - sprint-08-b2-mcp-client
+spec:
+  objective: >
+    Centralize typed errors and add optional circuit breaker/timeout guards to
+    prevent cascading failures during A2A/MCP operations.
+  context: >
+    Integration will surface flaky endpoints and transient network issues; we need
+    consistent error mapping and guarded retries to stabilize the loop.
+  technicalRequirements:
+    - Error types: A2AError | McpError | AuthError | TimeoutError | ValidationError
+    - Circuit breaker with half-open recovery and metrics-free counters
+    - Shared retry policies used by A2A/MCP clients
+    - Structured logs with correlation/request IDs
+  implementation:
+    inputSources:
+      - Failure cases observed in integration tests
+    coreComponents:
+      - Central error model + circuit breaker utility
+      - Tests for breaker behavior and error mapping
+    keyAlgorithms:
+      - Failure-rate/rolling-window breaker trip and cool-down
+      - Error mapping from HTTP/MCP layers to typed errors
+  acceptanceCriteria:
+    - Only typed errors escape public APIs; cause/stack preserved
+    - Breaker trips on repeated failures; recovers after cool-down
+    - Logs correlate retries for a given request ID
+  deliverables:
+    - Error model + breaker + tests
+    - Short internal troubleshooting guide
+  constraints:
+    - No heavy resilience deps; keep minimal and explicit
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-08-b6-e2e
+  name: Multi-Agent E2E (A2A → Discovery → MCP)
+  domain: build.integration
+  priority: critical
+  estimatedHours: 6
+  dependencies:
+    - sprint-08-b1-a2a-client
+    - sprint-08-b2-mcp-client
+    - sprint-08-b3-acm
+    - sprint-08-b4-urn-discovery
+    - sprint-08-b5-resilience
+spec:
+  objective: >
+    Validate the full runtime loop with two agents: A discovers B by URN, fetches ACM,
+    and executes B’s tool via MCP using the real clients.
+  context: >
+    This proves operational readiness of the runtime with real implementations, not stubs.
+  technicalRequirements:
+    - Local runnable scenario script (no internet dependency)
+    - Schema conformance on request/response for selected tool
+    - Deterministic assertions; structured logs for triage
+  implementation:
+    inputSources:
+      - Components delivered in B8.1–B8.5
+    coreComponents:
+      - E2E scenario script + tests + minimal README for maintainers
+    keyAlgorithms:
+      - Deterministic orchestration of discovery → validate → execute → assert
+  acceptanceCriteria:
+    - E2E passes consistently on fresh checkout
+    - Schema mismatch or connection errors produce actionable failure output
+    - No mocks; purely real A2A/MCP path
+  deliverables:
+    - Runnable E2E scenario + tests + short README
+  constraints:
+    - Must run against local services where possible; stable ports/config
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-08-b7-ci-gate
+  name: CI Gate for Runtime Integration
+  domain: build.ci
+  priority: high
+  estimatedHours: 3
+  dependencies:
+    - sprint-08-b6-e2e
+spec:
+  objective: >
+    Add a CI workflow that runs the runtime integration suite (A2A, MCP, discovery, E2E)
+    and blocks merges on regression.
+  context: >
+    Once green, the loop must be guarded to prevent drift.
+  technicalRequirements:
+    - GitHub Actions workflow (runtime-integration.yml)
+    - Jobs: unit (clients), integration (A2A/MCP/discovery), e2e
+    - Failure artifacts: logs, last ACM, request/response samples
+    - CI wall time target < 5 minutes on standard runners
+  implementation:
+    inputSources:
+      - Test suites from B8.1–B8.6
+    coreComponents:
+      - Workflow YAML + artifact export script
+    keyAlgorithms:
+      - Fail-fast with artifact collection on first error
+  acceptanceCriteria:
+    - CI blocks merge on any failing integration/E2E test
+    - Failure artifacts attached for triage automatically
+  deliverables:
+    - Workflow file + artifact exporter + brief CI notes
+  constraints:
+    - Keep runner requirements minimal; no privileged containers
+
+---
+apiVersion: mission.v1
+kind: Mission
+metadata:
+  id: sprint-08-b8-internal-docs
+  name: Internal Runtime Docs (Builder-Facing Only)
+  domain: build.docs
+  priority: medium
+  estimatedHours: 3
+  dependencies:
+    - sprint-08-b1-a2a-client
+    - sprint-08-b2-mcp-client
+    - sprint-08-b4-urn-discovery
+    - sprint-08-b6-e2e
+spec:
+  objective: >
+    Provide minimal, builder-only docs: how to run A2A/MCP locally, env vars,
+    and common errors. No public demo. No marketing.
+  context: >
+    Internal maintainers need a single source for setup and troubleshooting.
+  technicalRequirements:
+    - 1–2 pages per area: A2A, MCP, Discovery, E2E scenario
+    - Include env var table, local run commands, error FAQ
+  implementation:
+    inputSources:
+      - Working components and tests from Sprint 08
+    coreComponents:
+      - Builder docs set (runtime README + per-area pages)
+    keyAlgorithms:
+      - N/A (documentation and command recipes)
+  acceptanceCriteria:
+    - New maintainer can run E2E locally in < 15 minutes
+    - Docs reflect current flags/CLI/options exactly
+  deliverables:
+    - Builder-facing docs set (no public materials)
+  constraints:
+    - Keep terse and exact; screenshots optional/unnecessary

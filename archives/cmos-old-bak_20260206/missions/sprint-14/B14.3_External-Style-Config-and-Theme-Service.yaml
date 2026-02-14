@@ -1,0 +1,57 @@
+name: "Build.Implementation.v1"
+version: "1.0.0"
+displayName: "Implementation Mission"
+
+missionId: "B14.3-20251028"
+objective: >
+  Externalize Draw.io and Cytoscape style maps into JSON and implement a theme service
+  supporting light / dark modes and domain palettes.
+
+context: |
+  R14.3 (ADR-JSON-Schema-for-Externalized-Draw.io-Theming) defined a schema for theme and style config.  
+  This mission implements that schema and runtime serializer so both Draw.io and Cytoscape use a shared source of truth.
+
+successCriteria:
+  - "theme-style-schema.json validated and documented under /app/research/styles/."
+  - "CLI `theme switch <name>` applies theme and re-renders visualizations."
+  - "Draw.io and Cytoscape outputs visually consistent across themes."
+  - "Unit tests for schema validation and runtime serializer pass."
+
+deliverables:
+  - "/app/config/theme-style-schema.json"
+  - "/app/config/themes/light.json"
+  - "/app/config/themes/dark.json"
+  - "/app/src/visualization/theme/serializer.ts"
+  - "/app/tests/visualization/theme-serializer.test.ts"
+  - "/app/docs/dev/theme-service.md"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "R14.3 defined portable schema & token approach for externalized styles."
+      source: "/missions/research/R14.3_ADR-JSON-Schema-for-Externalized-Draw.io-Theming.md"
+  implementationScope:
+    coreDeliverable: >
+      1) Implement theme-style schema and sample themes (light/dark).  
+      2) Create serializer that maps JSON tokens → Draw.io key=value string and Cytoscape style objects.  
+      3) Add CLI command `theme switch <theme>` and auto-apply to exporters.  
+      4) Ensure CI tests render light/dark and compare visual hashes.
+  validationProtocol:
+    - validator: "CI-fast"
+      focus: "Schema validation and unit tests pass."
+    - validator: "Local"
+      focus: "Themes apply correctly and outputs visually match baseline."
+  handoffContext:
+    completed:
+      - "External themes and serializer operational."
+    nextMission: "B14.4-20251028"
+
+outcome:
+  status: "Completed"
+  summary: "Theme schema + light/dark manifests shipped with unified serializer, CLI switch workflow, docs, and tests."
+  artifacts:
+    - "config/theme-style-schema.json"
+    - "config/themes/light.json"
+    - "config/themes/dark.json"
+    - "src/visualization/theme/serializer.ts"
+    - "docs/dev/theme-service.md"

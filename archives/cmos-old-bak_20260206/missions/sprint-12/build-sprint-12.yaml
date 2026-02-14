@@ -1,0 +1,306 @@
+# pack.yaml - Metadata for the "Implementation" Domain Pack
+name: "Build.Implementation.v1"
+version: "1.0.0"
+displayName: "Implementation Mission"
+description: "Sprint 12 mission pack (M12.1–M12.5) informed by PRE12 probe results; sized for focused build iterations."
+author: "OSSP AGI"
+schema: "./schemas/Implementation.v1.json"
+
+---
+
+# Mission File: M12.1_ESM_Migration_and_Test_Hygiene.yaml
+missionId: "M12.1-20251012"
+objective: >
+  Migrate the remaining test/runtime touchpoints to ESM-safe patterns and consolidate on the Babel+jest toolchain.
+  Remove legacy shims, reduce moduleNameMapper to essentials, and eliminate '__dirname/__filename' leakage in prioritized paths.
+
+context: |
+  PRE12 probe validated Babel+jest as the executable ESM stack and produced a working temp config; MCP smoke also passed,
+  so we can proceed with a unified ESM config and phased path fixes (start with CLIs/test infra). Build root remains /app only.
+  References:
+    • ESM stack = babel-jest; stack_executed=true                                      (reports/pre12/probe.json)
+    • Temp ESM config confirmed                                                        (jest.temp.config.js)
+    • 65 '__dirname/__filename' occurrences identified (prioritize CLI & test infra)  (reports/pre12/dirname_hits.txt)
+    • Probe summary + perf baseline are green                                         (reports/pre12/probe.md, probe.json)
+
+successCriteria:
+  - "Jest runs ESM across the suite using a single committed config (no temp/overlay), with '@jest/globals' imports."
+  - "All tests pass with zero 'require is not defined' or '__dirname' errors."
+  - "moduleNameMapper trimmed to real aliases only; all CJS-only deps interop via babel-jest/dynamic import where needed."
+  - "Top-priority '__dirname/__filename' sites refactored (CLIs & test infra) without breaking CLI smoke paths."
+
+deliverables:
+  - "/app/jest.config.js updated for ESM via babel-jest"
+  - "/app/babel.config.cjs (presets: @babel/preset-env, @babel/preset-typescript)"
+  - "Refactors for prioritized files in /app/packages/runtime/bin/**, /app/packages/runtime/cli/**, /app/tests/**"
+  - "Changelog: /app/docs/dev/esm-migration-notes.md (ESM patterns, examples)"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Babel+jest ESM executed successfully (stack_executed=true)."  # PRE12 probe
+      source: "/app/reports/pre12/probe.json"  
+    - finding: "Temp ESM jest config is valid and runnable."
+      source: "/mnt/data/jest.temp.config.js"  
+    - finding: "65 '__dirname' sites enumerated; many in CLI and test infra."
+      source: "/mnt/data/dirname_hits.txt"  
+    - finding: "Probe summary confirms babel-jest path and perf OK."
+      source: "/mnt/data/probe.md"  
+  implementationScope:
+    coreDeliverable: >
+      Replace remaining test imports with @jest/globals; commit babel-jest config; refactor highest-traffic '__dirname' sites
+      using fileURLToPath(import.meta.url)+path.dirname; minimize mappers; add short "ESM patterns" guide.
+    outOfScope:
+      - "Complete elimination of all 65 sites (finish in later sprints)."
+      - "Tooling swaps beyond babel-jest."
+  plan:
+    - id: config-unify
+      description: "Commit babel-jest config into /app/jest.config.js and /app/babel.config.cjs; remove temp overlay."
+    - id: test-hygiene
+      description: "Update tests to import from '@jest/globals'; remove CJS-only shims; fix most frequent '__dirname' sites."
+    - id: mapper-trim
+      description: "Prune moduleNameMapper to essential aliases; prove green suite locally & CI."
+  validationProtocol:
+    - validator: "CI-fast"
+      focus: "Green run of unit + smoke subsets with ESM config."
+    - validator: "Local"
+      focus: "Full run; grep confirms zero '__dirname' errors."
+  handoffContext:
+    completed:
+      - "Unified ESM config; trimmed mappers; top-priority path fixes landed."
+    interfaces:
+      - "npm test (rooted at /app)"
+    assumptions:
+      - "Node 20; babel-jest + presets installed."
+    nextMission: "M12.2-20251012"
+    blockers: []
+
+---
+
+# Mission File: M12.2_MCP_Server_E2E_and_Agent_Runtime.yaml
+missionId: "M12.2-20251012"
+objective: >
+  Add an end-to-end test that spawns the protocol-mcp-server and exercises a minimal tool path:
+  protocol_list_test_files → protocol_discover_local → docs_mermaid; include a tiny in-test A2A stub for agent_run/workflow_run.
+
+context: |
+  The MCP smoke is now passing via stdio, returning structured tool lists and payloads. We’ll codify this into an E2E test,
+  hermetic and fast, asserting structured JSON and basic counts. Build remains /app-only.
+  References:
+    • MCP server init + tools list OK (stdio JSON-RPC)                                (reports/pre12/mcp.smoke.log)
+    • Tools available: protocol_list_test_files, protocol_discover_local, docs_mermaid (same log)
+    • Probe JSON marks protocol_discover_local/docs_mermaid OK                         (reports/pre12/probe.json)
+
+successCriteria:
+  - "E2E test spawns server on ephemeral port, calls: list_test_files → discover_local → docs_mermaid; asserts structured JSON."
+  - "A2A stub returns deterministically for agent_run/workflow_run (no real network)."
+  - "Test asserts node/edge counts or non-empty content; cleans up the process; runs in < 1s locally."
+
+deliverables:
+  - "/app/tests/e2e/mcp.e2e.test.ts"
+  - "/app/tests/_helpers/mcp-spawn.ts (port mgmt, teardown)"
+  - "/app/tests/_helpers/a2a-stub.ts"
+  - "Docs: /app/docs/dev/mcp-e2e.md (how to run locally/CI)"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "MCP init & tool discovery JSON confirmed."
+      source: "/mnt/data/mcp.smoke.log"  
+    - finding: "Probe JSON recorded tool success flags."
+      source: "/mnt/data/probe.json"  
+  implementationScope:
+    coreDeliverable: >
+      Spawn MCP server (STDIO/port 0), issue JSON-RPC calls to tools; verify response schemas; provide in-test stub for agent_run.
+    outOfScope:
+      - "Real remote A2A or full network flows."
+  plan:
+    - id: spawn
+      description: "Child-process spawn with ephemeral port; wait for ready banner."
+    - id: call-tools
+      description: "Call list_test_files → choose seed → discover_local → docs_mermaid; assert shape."
+    - id: stub-agent
+      description: "Add minimal A2A stub for agent_run/workflow_run; assert ok:true."
+  validationProtocol:
+    - validator: "CI-fast"
+      focus: "Run under 2s; hermetic; no network calls."
+    - validator: "Local"
+      focus: "Works on dev machines with no extra setup."
+  handoffContext:
+    completed:
+      - "Repeatable E2E for MCP; stubbed agent path."
+    interfaces:
+      - "npm run test:e2e:mcp"
+    assumptions:
+      - "Seeds exist under /app/seeds/openapi/* as in smoke."
+    nextMission: "M12.3-20251012"
+    blockers: []
+
+---
+
+# Mission File: M12.3_CLI_and_Scaffolding_Hardening.yaml
+missionId: "M12.3-20251012"
+objective: >
+  Ensure scaffold dry-run and write paths succeed for api/data/event protocols; preview output must redact secrets/tokens.
+  Add smoke tests to guard regressions in generated import paths.
+
+context: |
+  Authoring UX from Sprint 11 benefits from reliable scaffolds and redaction-for-preview. PRE12 redaction showed OK,
+  so we will codify that into tests and align generated paths with the ESM config.
+  References:
+    • Redaction OK in probe summary                                                              (reports/pre12/probe.md)
+    • Babel+jest ESM confirmed (affects generated import paths)                                 (probe.json, jest.temp.config.js)
+
+successCriteria:
+  - "Dry-run prints redacted preview (no tokens/keys); write generates compilable skeletons for api/data/event."
+  - "Smoke tests validate import paths of generated files under /app/templates/** + ESM."
+  - "Zero regressions in CLI entrypoints (still runnable under ESM)."
+
+deliverables:
+  - "Tests: /app/tests/cli/scaffold-smoke.test.ts (dry-run + write)"
+  - "Redaction helper used by preview: /app/src/lib/redact.ts (or reuse existing)"
+  - "Docs: /app/docs/dev/scaffold-guide.md (examples + redaction list)"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Redaction patterns pass probe checks."
+      source: "/mnt/data/probe.md"  
+    - finding: "Babel+jest ESM path in place for generated code checks."
+      source: "/mnt/data/probe.json"  
+  implementationScope:
+    coreDeliverable: >
+      Scaffold smoke tests for api/data/event; integrate redaction into preview; validate imports compile (TS/JS) under ESM.
+    outOfScope:
+      - "Non-core protocol scaffolds."
+  plan:
+    - id: dry-run
+      description: "Assert redaction in preview JSON/text (snapshots OK)."
+    - id: write
+      description: "Generate to tmp dir; run 'node --check' or ts compile on outputs."
+  validationProtocol:
+    - validator: "Local"
+      focus: "Snapshots: redaction proven; imports sane."
+    - validator: "CI-fast"
+      focus: "Run scaffold smoke in fast lane."
+  handoffContext:
+    completed:
+      - "Scaffold reliability and redaction locked-in."
+    interfaces:
+      - "cli: scaffold --type <api|data|event> --dry-run/--write"
+    assumptions:
+      - "Templates reside under /app/templates/*."
+    nextMission: "M12.4-20251012"
+    blockers: []
+
+---
+
+# Mission File: M12.4_Performance_and_CI_Guardrails.yaml
+missionId: "M12.4-20251012"
+objective: >
+  Split CI into 'fast' and 'full' jobs; enforce simple perf budgets using the Sprint 11 perf CLI/status.
+  Keep 'fast' ≤ 5 minutes; ensure 'full' remains within agreed thresholds.
+
+context: |
+  PRE12 perf baselines are well below SLOs (esm_probe ~309ms; mcp_smoke ~125ms). We’ll set budgets accordingly,
+  and wire the fast vs full matrix. /app is the only CI working-directory, and Docker, if invoked, builds from /app.
+  References:
+    • Perf baseline captured in probe JSON                                     (probe.json)
+    • Probe summary confirms green baseline                                    (probe.md)
+    • Tools + server already respond quickly                                   (mcp.smoke.log)
+
+successCriteria:
+  - "'fast' job: unit + selected integration/e2e (MCP smoke) ≤ 5m; 'full' runs entire suite within threshold."
+  - "Perf budget gate: fail if discovery_p95 > 1000 ms or mcp_p95 > 3000 ms (tuneable in config)."
+  - "Artifacts: .artifacts/perf.json published per job."
+
+deliverables:
+  - ".github/workflows/ci.yml updated (jobs: fast, full) with working-directory: app"
+  - "Perf budget script: /app/scripts/ci/perf-budget.js"
+  - "Metrics export: 'node app/cli/index.js perf:status --format json > .artifacts/perf.json'"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Baseline perf well under targets (esm_probe 309ms; mcp_smoke 125ms)."
+      source: "/mnt/data/probe.json"  
+    - finding: "Probe summary aligns with SLO expectations."
+      source: "/mnt/data/probe.md"  
+  implementationScope:
+    coreDeliverable: >
+      CI matrix with 'fast' vs 'full'; perf budget check using existing CLI metrics; publish perf artifacts.
+    outOfScope:
+      - "Complex flaky-test quarantine (handled in separate hardening)."
+  plan:
+    - id: fast-lane
+      description: "Tag tests (@fast) or folder filters; include MCP E2E smoke."
+    - id: full-lane
+      description: "Run complete suite; upload perf.json; gate budgets."
+  validationProtocol:
+    - validator: "CI"
+      focus: "Elapsed time + budgets respected; artifacts uploaded."
+  handoffContext:
+    completed:
+      - "Guardrails to keep signal fast, comprehensive runs controlled."
+    interfaces:
+      - "gh actions: fast/full; perf CLI used for budgets"
+    assumptions:
+      - "Babel ESM config is already committed (M12.1)."
+    nextMission: "M12.5-20251012"
+    blockers: []
+
+---
+
+# Mission File: M12.5_Governance_and_Catalog_Proof.yaml
+missionId: "M12.5-20251012"
+objective: >
+  Add a curated example manifest set and ensure cross-validation + docs generation work end-to-end.
+  Prove `docs_mermaid` diagram generation and `protocol_review` success on the sample set.
+
+context: |
+  The MCP tools expose both discovery and docs generation; we’ll provide a minimal curated set and assert the governance path.
+  References:
+    • MCP tools list includes docs_mermaid and protocol_review                      (mcp.smoke.log)
+    • Prior discover_local success with GitHub sample                              (mcp.smoke.log)
+
+successCriteria:
+  - "Curated example set checked into /app/examples/catalogs/sample-set/**."
+  - "docs_mermaid generates a diagram with expected node/edge counts (non-zero nodes)."
+  - "protocol_review returns OK; zero critical findings; report artifact captured."
+
+deliverables:
+  - "/app/examples/catalogs/sample-set/** (manifests + relationships)"
+  - "Tests: /app/tests/governance/catalog-proof.test.ts"
+  - "Artifacts directory for diagrams/reports: /app/.artifacts/governance/**"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Tools available & exercised in probe (docs_mermaid, review paths evident)."
+      source: "/mnt/data/mcp.smoke.log"  
+  implementationScope:
+    coreDeliverable: >
+      Curate a small but representative set; run docs_mermaid → check counts; run protocol_review → assert OK; store outputs.
+    outOfScope:
+      - "Large or external catalogs."
+  plan:
+    - id: curate
+      description: "Assemble 5–10 manifests with simple relationships; commit under examples."
+    - id: render
+      description: "Invoke docs_mermaid; parse output to assert counts (regex over 'graph' body)."
+    - id: review
+      description: "Call protocol_review; assert overall OK; persist markdown or JSON report."
+  validationProtocol:
+    - validator: "Local"
+      focus: "Artifacts written; assertions pass deterministically."
+    - validator: "CI-full"
+      focus: "Proof test runs in 'full' lane; outputs uploaded."
+  handoffContext:
+    completed:
+      - "Governance docs and cross-validation proven on curated set."
+    interfaces:
+      - "cli/mcp tools: docs_mermaid, protocol_review"
+    assumptions:
+      - "docs_mermaid output shape consistent with current server."
+    nextMission: ""
+    blockers: []

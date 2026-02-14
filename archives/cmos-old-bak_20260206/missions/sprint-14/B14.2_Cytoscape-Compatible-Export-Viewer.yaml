@@ -1,0 +1,54 @@
+name: "Build.Implementation.v1"
+version: "1.0.0"
+displayName: "Implementation Mission"
+
+missionId: "B14.2-20251028"
+objective: >
+  Extend visualization to export catalogs into Cytoscape-compatible JSON and provide
+  a lightweight WebGL viewer for large (> 250-node) diagrams.
+
+context: |
+  Based on R14.1 Linked-Diagram-Navigation, Draw.io remains optimal ≤ 250 nodes.  
+  For larger catalogs, a hybrid Draw.io + Cytoscape.js path maintains interactivity.
+  The viewer enables smooth navigation (60 fps) and hyperlink back to source manifests.
+
+successCriteria:
+  - "CLI `catalog export --format cytoscape` generates valid JSON matching Cytoscape schema."
+  - "Web viewer renders 500–1000-node graphs at ≥ 60 fps average."
+  - "Viewer integrates node click → manifest link navigation."
+  - "CI test verifies export / viewer integration."
+
+deliverables:
+  - "/app/src/visualization/cytoscape/exporter.ts"
+  - "/app/viewers/cytoscape/index.html"
+  - "/app/viewers/cytoscape/viewer.js"
+  - "/app/tests/visualization/cytoscape-exporter.test.ts"
+  - "/app/docs/dev/cytoscape-viewer.md"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "R14.1 benchmarked Draw.io vs Cytoscape; recommended hybrid approach."
+      source: "/missions/research/R14.1_Linked-Diagram-Navigation.md"
+  implementationScope:
+    coreDeliverable: >
+      1) Serializer converting catalog graph JSON → Cytoscape JSON structure.  
+      2) Static viewer HTML + JS bundle (using Cytoscape.js + Cytoscape-Cola layout).  
+      3) CLI integration: `catalog export --format cytoscape --open`.  
+      4) Link large catalogs (> 250 nodes) to viewer automatically.
+  plan:
+    - id: exporter
+      description: "Implement Cytoscape JSON export (positions auto-layout)."
+    - id: viewer
+      description: "Build WebGL viewer with filter/search & manifest links."
+    - id: tests
+      description: "Export → Viewer round-trip tests for 500 node graphs."
+  validationProtocol:
+    - validator: "Local"
+      focus: "Viewer opens and renders ≥ 60 fps; links resolve correctly."
+    - validator: "CI-full"
+      focus: "Export format validated vs Cytoscape schema."
+  handoffContext:
+    completed:
+      - "Cytoscape export + viewer available for large catalogs."
+    nextMission: "B14.3-20251028"

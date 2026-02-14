@@ -1,0 +1,76 @@
+name: "Build.Implementation.v1"
+version: "1.0.0"
+displayName: "Implementation Mission"
+
+missionId: "M13.3-20251013"
+objective: >
+  Implement the catalog CLI per the approved UX: noun-verb commands and safe-by-default artifact management.
+  Commands: `catalog list`, `catalog view <name>`, `catalog generate-diagram [name]` with -o/--overwrite/--open.
+
+context: |
+  Adopt the noun verb structure and hybrid output model (managed path with optional override).
+  Ensure progress spinner, success/error patterns, and colorized output with TTY detection.
+  Source research:
+    - /missions/research/r.13.3_Command-Line-Interface-UX-Proposal.md  :contentReference[oaicite:10]{index=10}
+    - /missions/research/r.13.1_Draw.io Diagrams_specs.md              :contentReference[oaicite:11]{index=11}
+    - /missions/research/r.13.2_unified-graph-schema.md                :contentReference[oaicite:12]{index=12}
+
+successCriteria:
+  - "`catalog list` prints table (Name, Version, Description)."
+  - "`catalog view <name>` prints detailed manifest info (friendly multiline)."
+  - "`catalog generate-diagram` writes to /app/artifacts/diagrams/catalog-<timestamp>.drawio (or -o path), refuses overwrite unless --overwrite."
+  - "`--open` invokes system opener (xdg-open/start/open) ONLY when interactive."
+  - "Help output shows all flags and examples; errors are actionable (what/why/how-to-fix)."
+
+deliverables:
+  - "/app/cli/commands/catalog-list.ts"
+  - "/app/cli/commands/catalog-view.ts"
+  - "/app/cli/commands/catalog-generate-diagram.ts   # wraps M13.2 + M13.1"
+  - "/app/src/cli/ux/console.ts                      # spinner, color, stderr formatting"
+  - "/app/docs/dev/cli-catalog.md                    # end-user doc (usage, flags, examples)"
+  - "/app/tests/cli/catalog-cli.test.ts              # golden snapshots for list/view; artifact path checks; no overwrite by default"
+
+domainFields:
+  type: "Build.Implementation.v1"
+  researchFoundation:
+    - finding: "Adopt catalog as primary noun; generate-diagram/list/view verbs; -o/--overwrite/--open semantics."
+      source: "/missions/research/r.13.3_Command-Line-Interface-UX-Proposal.md"  :contentReference[oaicite:13]{index=13}
+  implementationScope:
+    coreDeliverable: >
+      1) Wire list/view to catalog loader; pretty-table output with TTY color (auto-off when piped).
+      2) generate-diagram uses M13.2 builder and M13.1 exporter; safe defaults: create /app/artifacts/diagrams/ if needed.
+      3) Overwrite rule: refuse unless --overwrite present; error on stderr with next-step guidance.
+      4) Optional: --format drawio kept for forward compatibility.
+    outOfScope:
+      - "Web UI; this is CLI-only."
+  plan:
+    - id: commands
+      description: "Implement commands + help; strict arg parsing; examples in --help."
+    - id: artifact-mgmt
+      description: "Default path + timestamp naming; overwrite gate; --open (OS-detected)."
+    - id: tests
+      description: "End-to-end CLI tests (spawn), verifying outputs and exit codes."
+  validationProtocol:
+    - validator: "CI-fast"
+      focus: "CLI e2e runs < 2m; artifacts generated in correct path."
+  handoffContext:
+    completed:
+      - "Production-ready CLI for catalog visualization."
+    interfaces:
+      - "app-cli catalog list|view|generate-diagram"
+    assumptions:
+      - "M13.1 and M13.2 are available as importable modules."
+    nextMission: "M13.4-20251013"
+    blockers: []
+
+outcome:
+  status: Completed
+  summary: >
+    Implemented catalog list/view/diagram commands with shared UX helpers, safe artifact handling, documentation, and Jest coverage.
+  artifacts:
+    - app/cli/commands/catalog-list.js
+    - app/cli/commands/catalog-view.js
+    - app/cli/commands/catalog-generate-diagram.js
+    - app/src/cli/ux/console.js
+    - app/docs/dev/cli-catalog.md
+    - app/tests/cli/catalog-cli.test.ts

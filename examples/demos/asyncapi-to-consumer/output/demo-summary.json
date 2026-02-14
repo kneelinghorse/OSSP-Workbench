@@ -1,0 +1,29 @@
+{
+  "specPath": "/Users/systemsystems/portfolio/OSSP-Workbench/examples/demos/asyncapi-to-consumer/sample-spec.yaml",
+  "outputDir": "/Users/systemsystems/portfolio/OSSP-Workbench/examples/demos/asyncapi-to-consumer/output",
+  "manifestPath": "/Users/systemsystems/portfolio/OSSP-Workbench/examples/demos/asyncapi-to-consumer/output/manifests/event-manifest.json",
+  "graphPath": "/Users/systemsystems/portfolio/OSSP-Workbench/examples/demos/asyncapi-to-consumer/output/catalog-graph.json",
+  "consumerTsPath": "/Users/systemsystems/portfolio/OSSP-Workbench/examples/demos/asyncapi-to-consumer/output/generated/customer-events-profile-updated-consumer.ts",
+  "consumerJsPath": "/Users/systemsystems/portfolio/OSSP-Workbench/examples/demos/asyncapi-to-consumer/output/generated/customer-events-profile-updated-consumer.js",
+  "piiUtilTsPath": "/Users/systemsystems/portfolio/OSSP-Workbench/examples/demos/asyncapi-to-consumer/output/generated/utils/pii-masking.ts",
+  "piiUtilJsPath": "/Users/systemsystems/portfolio/OSSP-Workbench/examples/demos/asyncapi-to-consumer/output/generated/utils/pii-masking.js",
+  "detectedPatterns": [
+    "dlq_configured",
+    "user_keyed_ordering",
+    "backward_compatible_schema",
+    "high_fanout"
+  ],
+  "syntaxChecks": [
+    {
+      "filePath": "/Users/systemsystems/portfolio/OSSP-Workbench/examples/demos/asyncapi-to-consumer/output/generated/customer-events-profile-updated-consumer.js",
+      "ok": true,
+      "error": null
+    },
+    {
+      "filePath": "/Users/systemsystems/portfolio/OSSP-Workbench/examples/demos/asyncapi-to-consumer/output/generated/utils/pii-masking.js",
+      "ok": true,
+      "error": null
+    }
+  ],
+  "durationMs": 1326
+}
