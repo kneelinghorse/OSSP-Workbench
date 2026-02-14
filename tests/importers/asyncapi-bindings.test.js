@@ -62,6 +62,15 @@ describe('Protocol Binding Detection', () => {
     const manifest = result.manifests[0];
 
     expect(manifest.delivery.contract.retry_policy).toBe('exponential');
+    expect(manifest.delivery.contract.metadata['retry.backoff.ms']).toBe(1000);
+    expect(manifest.delivery.contract.metadata.retries).toBe(5);
+    expect(manifest.delivery.contract.metadata['auto.offset.reset']).toBe('earliest');
+    expect(manifest.delivery.contract.metadata['max.poll.records']).toBe(250);
+    expect(manifest.delivery.contract.metadata['session.timeout.ms']).toBe(45000);
+    expect(manifest.delivery.contract.metadata['heartbeat.interval.ms']).toBe(5000);
+    expect(manifest.delivery.contract.metadata['partition.assignment.strategy']).toBe('roundrobin');
+    expect(manifest.delivery.contract.metadata['batch.mode']).toBe('batch');
+    expect(manifest.delivery.contract.metadata['batch.max.messages']).toBe(120);
   });
 
   test('infers AMQP at-least-once guarantees from durable queue', async () => {

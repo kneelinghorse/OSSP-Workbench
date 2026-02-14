@@ -24,6 +24,14 @@ channels:
           min.insync.replicas: 2
           acks: all
           enable.idempotence: true
+          auto.offset.reset: earliest
+          max.poll.records: 250
+          session.timeout.ms: 45000
+          heartbeat.interval.ms: 5000
+          rebalance.timeout.ms: 70000
+          partition.assignment.strategy: roundrobin
+          batch.mode: batch
+          batch.max.messages: 120
           retry.backoff.ms: 1000
           retries: 5
           dead.letter.queue.topic.name: orders.created.dlq

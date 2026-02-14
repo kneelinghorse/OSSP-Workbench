@@ -5,7 +5,7 @@
  *
  * Lightweight wrapper to generate event consumers from manifests.
  * Usage:
- *   protocol-generate consumer <input> [--output <dir>] [--js] [--no-tests] [--no-pii-util] [--batch]
+ *   ossp-consumer-gen consumer <input> [--output <dir>] [--js] [--no-tests] [--no-pii-util] [--batch]
  */
 
 import { Command } from 'commander';
@@ -13,9 +13,9 @@ import { Command } from 'commander';
 const program = new Command();
 
 program
-  .name('protocol-generate')
+  .name('ossp-consumer-gen')
   .description('Generate event consumer code from manifests')
-  .version('0.1.0');
+  .version('1.0.0');
 
 program
   .command('consumer <input>')

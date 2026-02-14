@@ -1,0 +1,63 @@
+asyncapi: '2.6.0'
+info:
+  title: Kafka Schema Registry Fixtures
+  version: 1.0.0
+  description: Fixture with Avro and Protobuf message content types.
+
+servers:
+  kafkaBroker:
+    url: localhost:9092
+    protocol: kafka
+
+channels:
+  payments.avro:
+    publish:
+      summary: Publish payment events encoded with Avro
+      message:
+        $ref: '#/components/messages/PaymentAvro'
+    bindings:
+      kafka:
+        topic: payments.avro
+        partitions: 1
+
+  payments.protobuf:
+    publish:
+      summary: Publish payment events encoded with Protobuf
+      message:
+        $ref: '#/components/messages/PaymentProtobuf'
+    bindings:
+      kafka:
+        topic: payments.protobuf
+        partitions: 1
+
+components:
+  messages:
+    PaymentAvro:
+      name: PaymentAvro
+      title: Payment Avro Event
+      contentType: application/vnd.apache.avro+binary
+      x-schema-compatibility: backward_transitive
+      payload:
+        type: object
+        required:
+          - paymentId
+          - amount
+        properties:
+          paymentId:
+            type: string
+          amount:
+            type: number
+
+    PaymentProtobuf:
+      name: PaymentProtobuf
+      title: Payment Protobuf Event
+      contentType: application/protobuf
+      payload:
+        type: object
+        required:
+          - paymentId
+        properties:
+          paymentId:
+            type: string
+          status:
+            type: string

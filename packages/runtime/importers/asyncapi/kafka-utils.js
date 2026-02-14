@@ -33,6 +33,17 @@ function extractKafkaBindings(kafkaBinding, channel, meta = {}) {
       min_insync_replicas: config['min.insync.replicas'],
       compression_type: config['compression.type'],
       max_message_bytes: config['max.message.bytes'],
+      'auto.offset.reset': config['auto.offset.reset'],
+      'max.poll.records': config['max.poll.records'],
+      'session.timeout.ms': config['session.timeout.ms'],
+      'heartbeat.interval.ms': config['heartbeat.interval.ms'],
+      'rebalance.timeout.ms': config['rebalance.timeout.ms'],
+      'partition.assignment.strategy': config['partition.assignment.strategy'],
+      'batch.mode': config['batch.mode'],
+      'batch.max.messages': config['batch.max.messages'],
+      'retry.backoff.ms': config['retry.backoff.ms'],
+      retries: config.retries ?? config['max.retries'],
+      retry_backoff_multiplier: config['retry.backoff.multiplier'],
       pointer: meta.pointer,
       channel: channel?.id ? channel.id() : undefined
     }

@@ -71,4 +71,21 @@ describe('AsyncAPI Importer', () => {
     // Parser initialization adds overhead on first run
     expect(result.metadata.parse_time_ms).toBeLessThan(4000);
   });
+
+  test('captures schema registry serialization metadata from message contentType', async () => {
+    const specPath = path.join(fixturesPath, 'kafka-schema-registry.yaml');
+    const result = await importAsyncAPI(specPath);
+
+    const avroManifest = result.manifests.find((manifest) => manifest.event?.name === 'payments.avro');
+    const protobufManifest = result.manifests.find((manifest) => manifest.event?.name === 'payments.protobuf');
+
+    expect(avroManifest).toBeDefined();
+    expect(avroManifest.delivery.contract.metadata.contentType).toBe('application/vnd.apache.avro+binary');
+    expect(avroManifest.delivery.contract.metadata.serializationFormat).toBe('avro');
+    expect(avroManifest.delivery.contract.metadata.schemaCompatibility).toBe('backward_transitive');
+
+    expect(protobufManifest).toBeDefined();
+    expect(protobufManifest.delivery.contract.metadata.contentType).toBe('application/protobuf');
+    expect(protobufManifest.delivery.contract.metadata.serializationFormat).toBe('protobuf');
+  });
 });

@@ -1,10 +1,23 @@
 {
-  "name": "oss-protocols",
-  "version": "0.1.0",
+  "name": "ossp-consumer-gen",
+  "version": "1.0.0",
   "type": "module",
-  "private": true,
   "description": "Protocol-Driven Discovery tooling and missions",
+  "files": [
+    "packages/",
+    "templates/",
+    "cli/",
+    "src/",
+    "utils/",
+    "config/",
+    "viewers/",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "bin": {
+    "ossp-consumer-gen": "./packages/runtime/cli/generate-cli.js",
+    "ossp": "./packages/runtime/cli/index.js",
+    "ossp-mcp-server": "./packages/runtime/bin/protocol-mcp-server.js",
     "protocol-discover": "./packages/runtime/cli/index.js",
     "protocol-generate": "./packages/runtime/cli/generate-cli.js",
     "protocol-mcp-server": "./packages/runtime/bin/protocol-mcp-server.js"
@@ -14,6 +27,8 @@
     "test:watch": "jest --watch",
     "test:ci": "jest --ci --coverage --maxWorkers=2 --testTimeout=30000",
     "test:fast": "jest --config ./jest.fast.config.js --ci --maxWorkers=2 --testTimeout=20000",
+    "test:packaging": "jest --runTestsByPath tests/distribution/npm-package.test.ts --ci --runInBand",
+    "test:integration:brokers": "RUN_BROKER_INTEGRATION=1 jest --runTestsByPath tests/integration/broker-testcontainers.integration.test.ts --ci --runInBand --testTimeout=300000",
     "generate:sprint-summary": "tsx ./scripts/reports/sprint-summary-generator.ts",
     "test:esm:probe": "jest -c ./jest.esm.ci.js --runTestsByPath tests/_probe/esm.sample.test.ts",
     "test:performance": "node packages/runtime/scripts/performance-benchmark.js",
@@ -30,7 +45,8 @@
     "docker:stop": "docker stop ossp-agi-mcp && docker rm ossp-agi-mcp",
     "ci:full": "npm run check:boundaries && npm run test:ci && npm run test:performance && npm run docker:build",
     "probe:pre12": "node scripts/probe/pre12.collect.js all",
-    "test:e2e:mcp": "jest --runTestsByPath tests/e2e/mcp.e2e.test.ts"
+    "test:e2e:mcp": "jest --runTestsByPath tests/e2e/mcp.e2e.test.ts",
+    "validate:asyncapi:realworld": "node scripts/validation/real-world-asyncapi-validation.js"
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "^10.0.3",
@@ -38,12 +54,19 @@
     "@babel/core": "^7.28.4",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
+    "@kafkajs/confluent-schema-registry": "^3.9.0",
+    "@testcontainers/kafka": "^11.11.0",
+    "@testcontainers/rabbitmq": "^11.11.0",
+    "amqplib": "^0.10.9",
     "babel-jest": "^29.7.0",
     "jest": "^29.7.0",
+    "kafkajs": "^2.2.4",
     "light-my-request": "^6.6.0",
+    "mqtt": "^5.15.0",
     "supertest": "^7.1.4",
-    "yaml": "^2.8.1",
-    "tsx": "^4.15.7"
+    "testcontainers": "^11.11.0",
+    "tsx": "^4.15.7",
+    "yaml": "^2.8.1"
   },
   "engines": {
     "node": ">=18"
@@ -61,6 +84,7 @@
     "fs-extra": "^11.3.2",
     "graphology": "^0.26.0",
     "graphology-traversal": "^0.3.1",
+    "handlebars": "^4.7.8",
     "inquirer": "^12.9.6",
     "lru-cache": "^10.4.3",
     "node-fetch": "^3.3.0",

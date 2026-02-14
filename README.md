@@ -1,121 +1,149 @@
-# OSSP Workbench
+# OSSP Consumer Gen
 
-OSSP Workbench turns API/event/database contracts into usable engineering artifacts.
+`ossp-consumer-gen` turns AsyncAPI contracts into runnable consumer code for Kafka, AMQP, and MQTT.
 
-Core value:
-- Import contracts from OpenAPI, AsyncAPI, and PostgreSQL
-- Generate concrete outputs (catalog manifests, dependency graphs, visualizations, consumer code)
-- Keep protocol relationships traceable via URNs and catalog graph metadata
+## Value Proposition
 
-## Quickstart (<5 minutes)
+- Import AsyncAPI specs and normalize them into event manifests.
+- Generate transport-specific consumer implementations with governance hints.
+- Keep protocol metadata traceable (URNs, detected patterns, contract context).
+- Validate generation quality against real-world public AsyncAPI specs.
 
-### Prerequisites
+## Install
 
-- Node.js 18+
-- npm
-
-### 1. Install
+### Run without installing
 
 ```bash
-git clone <your-repo-url>
+npx ossp-consumer-gen --help
+```
+
+### Global install
+
+```bash
+npm install -g ossp-consumer-gen
+```
+
+### Local development
+
+```bash
+git clone <repo-url>
 cd OSSP-Workbench
 npm install
 ```
 
-### 2. Run OpenAPI end-to-end demo
+## CLI Usage
+
+Primary workflow (AsyncAPI spec to consumer code):
 
 ```bash
-npm run demo:openapi-viz
+ossp generate consumer --spec ./asyncapi.yaml --output ./generated
 ```
 
-Outputs:
-- `examples/demos/openapi-to-viz/output/catalog-graph.json`
-- `examples/demos/openapi-to-viz/output/openapi-cytoscape.json`
-- `examples/demos/openapi-to-viz/output/openapi-diagram.drawio`
-
-### 3. Run AsyncAPI end-to-end demo
+Transport and language selection:
 
 ```bash
-npm run demo:asyncapi-consumer
+ossp generate consumer --spec ./asyncapi.yaml --transport amqp --lang js --output ./generated
 ```
 
-Outputs:
-- `examples/demos/asyncapi-to-consumer/output/manifests/event-manifest.json`
-- `examples/demos/asyncapi-to-consumer/output/generated/customer-events-profile-updated-consumer.ts`
-- `examples/demos/asyncapi-to-consumer/output/demo-summary.json`
+Flags:
 
-## Import Paths (All 3)
+- `--spec` AsyncAPI 2.x/3.x YAML or JSON file (required)
+- `--output` output directory (default: `generated-consumers`)
+- `--transport` `kafka` (default), `amqp`, or `mqtt`
+- `--lang` `ts` (default) or `js`
+- `--no-tests` skip test scaffolds
+- `--no-pii-util` skip PII utility generation
 
-### OpenAPI import path
-
-Command (verified):
+Legacy manifest-based workflow (still supported):
 
 ```bash
-npm run demo:openapi-viz
+ossp-consumer-gen consumer <manifest.json> --output ./generated
 ```
 
-What it does:
-- Imports `examples/demos/openapi-to-viz/sample-spec.json`
-- Registers manifests
-- Builds catalog graph
-- Exports Cytoscape JSON + DrawIO XML
+### Template Customization
 
-### AsyncAPI import path
+Consumer generators load templates from `templates/consumers/` by default:
 
-Command (verified):
+- `templates/consumers/kafka.hbs`
+- `templates/consumers/amqp.hbs`
+- `templates/consumers/mqtt.hbs`
+
+Programmatic generation can override templates:
+
+```js
+import { generateEventConsumer } from './packages/runtime/generators/consumers/index.js';
+
+const result = generateEventConsumer(manifest, {
+  templateDir: '/path/to/custom/templates', // expects kafka.hbs/amqp.hbs/mqtt.hbs
+  templateOverrides: {
+    kafka: '/path/to/one-off/custom-kafka.hbs'
+  }
+});
+```
+
+Example output:
+
+```text
+✓ order-created-consumer.ts
+✓ tests/order-created-consumer.test.ts
+✓ utils/pii-masking.ts
+```
+
+## Real-World AsyncAPI Validation
+
+Run public-spec validation:
 
 ```bash
-npm run demo:asyncapi-consumer
+npm run validate:asyncapi:realworld
 ```
 
-What it does:
-- Imports `examples/demos/asyncapi-to-consumer/sample-spec.yaml`
-- Registers manifest + catalog graph
-- Generates Kafka consumer code with DLQ/error/PII handling hooks
-- Validates generated JS equivalents with `node --check`
+Latest run summary (`reports/real-world-asyncapi-validation.md`):
 
-### PostgreSQL import path
+- Specs tested: `4`
+- Specs passed: `4`
+- Import failures: `0`
+- Generation failures: `0`
+- Syntax failures: `0`
+- Supported manifests generated: `14/14`
 
-Verified example flow (local PostgreSQL):
+Validated public/community specs:
 
-1. Create a demo schema/table:
+- AsyncAPI `streetlights-kafka` (`v2.6.0`)
+- AsyncAPI `streetlights-mqtt` (`v2.6.0`)
+- AsyncAPI `streetlights-operation-security` (`v2.6.0`)
+- AsyncAPI `rpc-client` (`v2.6.0`)
+
+## Architecture
+
+Pipeline:
+
+1. AsyncAPI import (`packages/runtime/importers/asyncapi/importer.js`)
+2. Transport + pattern detection (`kafka`/`amqp`/`mqtt`)
+3. Consumer generation (`packages/runtime/generators/consumers/`)
+4. Syntax and packaging validation (Jest + `node --check` + npm pack checks)
+
+Key directories:
+
+- `packages/runtime/importers/asyncapi/` importer and heuristics
+- `packages/runtime/generators/consumers/` code generation for Kafka/AMQP/MQTT
+- `tests/generators/` transport generator unit tests
+- `tests/integration/broker-testcontainers.integration.test.ts` real broker integration suite
+- `reports/real-world-asyncapi-validation.md` latest public-spec validation report
+
+## Comparison To Alternatives
+
+| Approach | Strength | Gap | OSSP Consumer Gen Advantage |
+|---|---|---|---|
+| Generic AsyncAPI docs tooling | Great for schema browsing | No production-ready consumer scaffolds | Generates transport-specific consumer code with operational hints |
+| Hand-written consumer templates | Flexible | Inconsistent and error-prone at scale | Repeatable generation from contract source of truth |
+| Broker-specific starter kits | Fast per transport | Weak cross-transport standardization | One pipeline for Kafka, AMQP, and MQTT |
+
+## Validation And CI Commands
 
 ```bash
-psql -h localhost -p 5432 -U <user> -d <db> -c "CREATE SCHEMA IF NOT EXISTS ossp_demo; CREATE TABLE IF NOT EXISTS ossp_demo.customers (id SERIAL PRIMARY KEY, email TEXT NOT NULL, full_name TEXT, phone TEXT);"
+npm run test:packaging
+npm run validate:asyncapi:realworld
+npm run test:integration:brokers
 ```
 
-2. Run importer and write manifest:
-
-```bash
-OSSP_PG_URL='postgresql://<user>@localhost:5432/<db>' node --input-type=module -e "import fs from 'fs/promises'; import { PostgresImporter } from './packages/runtime/importers/postgres/importer.js'; const importer = new PostgresImporter(); const manifest = await importer.import(process.env.OSSP_PG_URL, 'ossp_demo'); await fs.mkdir('artifacts/quickstart/postgres', { recursive: true }); await fs.writeFile('artifacts/quickstart/postgres/postgres-manifest.draft.json', JSON.stringify(manifest, null, 2) + '\n'); console.log('datasets', manifest.datasets?.length ?? 0);"
-```
-
-3. Optional cleanup:
-
-```bash
-psql -h localhost -p 5432 -U <user> -d <db> -c "DROP SCHEMA IF EXISTS ossp_demo CASCADE;"
-```
-
-## End-to-End Demo Directories
-
-- OpenAPI -> Visualization: `examples/demos/openapi-to-viz`
-- AsyncAPI -> Consumer: `examples/demos/asyncapi-to-consumer`
-
-Each demo directory includes:
-- sample contract file
-- one-command runner
-- generated output artifacts
-- local README
-
-## Validation Commands
-
-Run focused validation for Sprint 3 demo work:
-
-```bash
-npx jest --runTestsByPath tests/e2e/openapi-to-viz-demo.test.ts tests/e2e/asyncapi-to-consumer-demo.test.ts tests/generators/kafka-consumer-generator.test.js
-```
-
-## Notes
-
-- `npm run cli -- discover ...` exists but currently has runtime option parsing issues in this workspace.
-- The demo commands above are the verified path for onboarding and reproducible outputs.
+`test:integration:brokers` requires a running Docker-compatible container runtime for Testcontainers.

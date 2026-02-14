@@ -1,190 +1,92 @@
-# OSSP-Workbench — Technical Architecture
+# OSSP-Workbench Technical Architecture
 
-*Grounded in M01-M04 findings (2026-02-09). This document describes what actually exists, not aspirations.*
+*Last updated: 2026-02-14 (post s4-s7 completion review)*
 
-## Product Definition
+## System Intent
 
-OSSP-Workbench is a CLI tool that converts OpenAPI, AsyncAPI, and database schemas into validated protocol manifests, generates production consumer code, and exports architecture visualizations — replacing manual service documentation with automated discovery.
+OSSP-Workbench ingests API/event specifications, extracts governance intelligence, and generates production-ready consumer runtime code for platform teams.
 
-**Target users**: Platform engineering teams managing microservice ecosystems.
+## Current Architecture (Implemented)
 
-## Architecture
-
-```
-                        ACTUAL SYSTEM ARCHITECTURE
-
-    ┌───────────────────────────────────────────────────┐
-    │                   CLI Layer                        │
-    │   discover | generate | validate | scaffold |     │
-    │   diff | governance | serve | review              │
-    └──────┬──────────┬──────────┬──────────┬──────────┘
-           │          │          │          │
-    ┌──────▼──────┐ ┌─▼────────┐│   ┌──────▼──────┐
-    │ Visualization│ │Generator ││   │  MCP Server │
-    │ Cytoscape   │ │ Consumer ││   │  (optional) │
-    │ DrawIO      │ │ Scaffold ││   └─────────────┘
-    └──────┬──────┘ │ IaC      ││
-           │        └──┬───────┘│
-    ┌──────▼───────────▼────────▼───────────────────┐
-    │              URN Catalog                        │
-    │  Primary: O(1) URN lookup (Map)                │
-    │  Secondary: byType, byTag, byOwner, byPII     │
-    │  Graph: dependency tracking, cycle detection    │
-    │  Supports: api, data, event, ui protocols       │
-    └──────┬───────────────────────┬─────────────────┘
-           │                       │
-    ┌──────▼──────┐   ┌───────────▼──────────────┐
-    │  Importers   │   │  Protocol Definitions    │
-    │ OpenAPI 3.x  │   │                          │
-    │ AsyncAPI 2.x │   │  Tier 1: api, data,     │
-    │ PostgreSQL   │   │    event, ui (cataloged) │
-    │              │   │  Tier 2: agent (custom)  │
-    │  → Validated │   │  Tier 3: 13 standalone   │
-    │    manifests │   │    (validate+generate)   │
-    └──────────────┘   └──────────────────────────┘
+```text
+AsyncAPI/OpenAPI/DB Specs
+  -> Import + Normalize
+  -> Pattern + PII + Governance Analysis
+  -> Validated Manifest(s)
+  -> Transport Consumer Generation (Kafka/AMQP/MQTT)
+  -> Runtime Concerns (auth/schema/error handling/observability)
+  -> CLI + npm Distribution + Test/Validation Pipelines
 ```
 
-## Core Components
+## Core Layers
 
-### 1. Protocol Definitions (18 types)
-**Location**: `packages/protocols/src/`
-**Status**: Complete
+### 1. Ingestion and Normalization
 
-Each protocol file (200-600 lines) provides:
-- Manifest shape definition
-- `validateManifest()` function
-- Code generators
-- Query helpers
+- AsyncAPI importer supports 2.x and 3.x and normalizes schema/channel structure for downstream generation.
+- Import path outputs validated manifests with governance metadata and URN-based identity.
 
-Protocols are organized in three tiers:
-- **Tier 1** (4): api, data, event, ui — full catalog URN support
-- **Tier 2** (1): agent — custom catalog indexes (tool, resource, workflow, API)
-- **Tier 3** (13): workflow, ai-ml, analytics, config, docs, iam, infra, integration, observability, release, semantic, testing, hardware — standalone validation and generation
+### 2. Intelligence and Governance Extraction
 
-### 2. Importers (3 working)
-**Location**: `packages/runtime/importers/`
-**Status**: Production-grade
+- Pattern engine detects delivery and operations patterns (retry, DLQ, ordering, fanout, schema evolution) with confidence scoring.
+- Multi-signal PII detection combines field-name heuristics, value pattern checks, and schema analysis.
+- Governance metadata is attached at manifest and generated-code annotation points.
 
-| Importer | Input | Output | Tests |
-|----------|-------|--------|-------|
-| OpenAPI | OpenAPI 3.x JSON/YAML | API protocol manifest with URNs, endpoints, auth | 26/26 pass |
-| AsyncAPI | AsyncAPI 2.x YAML | Event protocol manifests with PII, delivery, governance | 63/63 pass |
-| PostgreSQL | PostgreSQL schemas | Data protocol manifest with PII detection | All pass |
+### 3. Consumer Generation Engine
 
-Each importer produces validated manifests that can be indexed in the URN catalog.
+- Template engine (`templates/consumers/*.hbs`) replaces direct string concatenation.
+- Template overrides are supported for team customization (`templateDir`, `templateOverrides`).
+- Output targets TypeScript/JavaScript across Kafka, AMQP, and MQTT.
 
-### 3. URN Catalog
-**Location**: `packages/protocols/src/catalog/`
-**Status**: Fully working (5/5 test suites pass)
+### 4. Transport Runtime Hardening
 
-- **Primary index**: O(1) URN lookups via Map
-- **Secondary indexes**: byType, byTag, byOwner, byPII, byClassification, byNamespace
-- **Dependency graph**: Kahn's topological sort, Tarjan's cycle detection
-- **Agent indexes**: byTool, byResource, byWorkflow, byAPI
-- **Query system**: CatalogQuery class for complex queries
+#### Kafka
 
-### 4. Generators
-**Location**: `packages/runtime/generators/`
-**Status**: Near-complete (17/18, hardware stubbed)
+- Auth and connection support: SASL/SCRAM-256, SASL/SCRAM-512, SASL/PLAIN, mTLS, OAuth.
+- Schema-aware paths for registry-backed serialization/deserialization.
+- Consumer controls for offsets, group behavior, and batching.
+- Reliability: retry/backoff and DLQ routing paths.
 
-| Generator | Protocol | Output |
-|-----------|----------|--------|
-| Kafka consumer | Event | Production TypeScript with PII masking, DLQ, error handling |
-| AMQP consumer | Event | Production TypeScript |
-| MQTT consumer | Event | Production TypeScript |
-| Protocol scaffolder | API, Data, Event, Workflow, UI | Manifest templates |
-| Framework generators | UI | React, Vue, Svelte components |
-| IaC generators | Infrastructure | Terraform, CloudFormation |
-| Config generators | Configuration | YAML, JSON, HCL |
-| Device driver stubs | Hardware | Placeholder only (STUBBED) |
+#### AMQP
 
-### 5. Visualization
-**Location**: `src/visualization/`
-**Status**: Complete (4/4 test suites pass)
+- Authentication-aware connection setup.
+- Channel pooling and reconnect strategies.
+- Hardened failure paths for operational resilience.
 
-- **Cytoscape exporter**: Produces Cytoscape.js-compatible JSON with elements, style, layout
-- **DrawIO exporter**: Produces mxGraphModel XML with guardrails and domain styling
-- **Theme system**: Light/dark themes with serializer
+#### MQTT
 
-Input: Canonical graph format `{ nodes[], edges[] }` validated via AJV schema.
+- Auth/TLS-aware connection setup.
+- Reconnect handling and LWT configuration paths.
+- Hardened runtime behavior aligned with parity goals.
 
-### 6. CLI
-**Location**: `packages/runtime/cli/`
-**Status**: 8 commands operational
+### 5. Observability and Operations
 
-Commands: `discover`, `generate`, `validate`, `scaffold`, `diff`, `governance`, `serve`, `review`
+- Structured logging hooks in generated consumers.
+- Metrics/telemetry hook points for Prometheus/OpenTelemetry integration.
+- Governance comments and PII masking utilities preserved in generated output.
 
-Entry points:
-- `protocol-discover` — main CLI
-- `protocol-generate` — code generation
-- `protocol-mcp-server` — MCP server
+### 6. Distribution and Execution Surface
 
-### 7. MCP Server
-**Location**: `packages/runtime/mcp/`
-**Status**: Starts and runs with performance optimizations
+- Primary command: `ossp generate consumer --spec <file> --output <dir> [--transport kafka|amqp|mqtt] [--lang ts|js]`.
+- Package is buildable/distributable for CLI execution (`npx`/npm package workflow).
+- CI workflows include packaging and broker integration validation paths.
 
-Optional component for IDE/agent integration. Starts in <1s with lazy loading.
+## Validation Evidence
 
-## Data Flow: End-to-End Paths
+- Generator test suites for Kafka, AMQP, and MQTT executed and passing.
+- CLI generation command tests passing.
+- Broker integration suite executed with passing scenarios.
+- Real-world AsyncAPI validation artifacts generated and passing.
 
-### Path 1: OpenAPI → Visualization
-```
-OpenAPI 3.x spec → OpenAPIImporter.import() → API manifest (URN-addressed)
-  → catalog.add() → secondary indexes built → exportCytoscape() → graph JSON
-```
+## Operational State (CMOS)
 
-### Path 2: AsyncAPI → Consumer Code
-```
-AsyncAPI 2.x spec → importAsyncAPI() → Event manifests (2+ per spec)
-  → catalog.add() → generateKafkaConsumer() → 90+ lines TypeScript
-```
+- No active or queued missions in the current queue.
+- Sprints `s4`, `s5`, `s6`, and `s7` are `Completed` in CMOS.
 
-### Path 3: CLI Scaffold → Manifest
-```
-protocol-discover scaffold --type api → template processing
-  → validated manifest → catalog indexing → visualization
-```
+## Remaining Work Classification
 
-## Performance Characteristics
+No committed architecture backlog remains for the current program plan. Remaining work is enhancement-oriented (not gap-closure), such as:
 
-| Operation | Target | Actual |
-|-----------|--------|--------|
-| OpenAPI parse | <1s | <400ms for 10k lines |
-| AsyncAPI parse | <4s (first run) | 112ms (warm) |
-| URN catalog lookup | O(1) | <1ms |
-| Consumer generation | <100ms | <100ms |
-| Template render | <10ms | <10ms |
-| Graph operations | <10ms for 1k nodes | <10ms |
-
-## Module System
-
-- **Package type**: ESM (`"type": "module"` in package.json)
-- **Runtime**: Node.js >= 18
-- **Test runner**: Jest 29.7 with `--experimental-vm-modules`
-- **Known issue**: Mixed ESM/CJS boundary causes 42 test suite failures (Jest "module already linked"). Core functionality unaffected.
-
-## Dependencies (Runtime)
-
-| Package | Purpose |
-|---------|---------|
-| graphology | In-memory dependency graphs |
-| ajv | JSON Schema validation |
-| commander | CLI framework |
-| express | MCP server, viewer |
-| pg | PostgreSQL schema introspection |
-| xmlbuilder2 | DrawIO XML generation |
-| xxhash-addon | Fast content hashing |
-| js-yaml | YAML parsing |
-
-## Security
-
-- **PII detection**: Pattern-based (11 credential types) + entropy-based (>4.5 bits, >20 chars)
-- **Redaction**: Immutable clone-based; original manifests never modified
-- **Precompiled patterns**: RegExp compiled at module load for <1ms scans
-
-## Constraints
-
-1. **Catalog supports 4 protocol types** — extending requires schema.js ProtocolType enum changes
-2. **File-based persistence** — no distributed locking; single-process updates only
-3. **OpenAPI 3.x only** — no 2.0/Swagger support
-4. **Local $refs** — external HTTP $refs supported in parser extensions but not default path
+1. Additional transport/provider presets and opinionated templates.
+2. Deeper performance soak benchmarks for generated consumers.
+3. Extended fixture corpus for edge-case real-world specs.
+4. Release governance hardening (provenance/signing/policy gates).

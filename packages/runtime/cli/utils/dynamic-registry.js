@@ -520,6 +520,31 @@ const defaultCommands = {
     }
   },
 
+  generate: {
+    module: '../commands/generate.js',
+    description: 'Generate transport-specific consumers from AsyncAPI specs',
+    usage: 'ossp generate consumer --spec <file> [options]',
+    arguments: [
+      { name: 'target', required: true, description: 'Generation target (consumer)' }
+    ],
+    options: [
+      { name: '--spec <file>', description: 'AsyncAPI 2.x/3.x YAML or JSON spec path', required: true },
+      { name: '--output <dir>', description: 'Output directory', default: 'generated-consumers' },
+      { name: '--transport <transport>', description: 'Target transport (kafka, amqp, mqtt)', default: 'kafka' },
+      { name: '--lang <lang>', description: 'Output language (ts, js)', default: 'ts' },
+      { name: '--no-tests', description: 'Skip generated test scaffolds' },
+      { name: '--no-pii-util', description: 'Skip generated PII utility' }
+    ],
+    examples: [
+      'ossp generate consumer --spec ./events.yaml --output ./generated',
+      'ossp generate consumer --spec ./events.json --transport amqp --lang js'
+    ],
+    errorMapping: {
+      'ENOENT': ['Check that the AsyncAPI spec path exists', 'Verify read permissions for the spec file'],
+      'VALIDATION_FAILED': ['Validate AsyncAPI schema syntax', 'Use a supported AsyncAPI 2.x or 3.x document']
+    }
+  },
+
   'catalog:export': {
     module: '../../../../cli/commands/catalog-export.js',
     description: 'Export current workspace catalog to JSON snapshot',

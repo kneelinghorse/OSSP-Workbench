@@ -1,0 +1,73 @@
+{
+  "runId": "2026-02-14T03-10-08-114Z",
+  "generatedAt": "2026-02-14T03:10:09.615Z",
+  "summary": {
+    "specsTested": 4,
+    "specsPassed": 4,
+    "importFailures": 0,
+    "generationFailures": 0,
+    "syntaxFailures": 0,
+    "supportedManifests": 14,
+    "generatedManifests": 14
+  },
+  "specResults": [
+    {
+      "id": "streetlights-kafka",
+      "source": "AsyncAPI community examples",
+      "url": "https://raw.githubusercontent.com/asyncapi/spec/v2.6.0/examples/streetlights-kafka.yml",
+      "asyncapiVersion": "2.6.0",
+      "channelCount": 4,
+      "messageCount": 4,
+      "manifestCount": 4,
+      "supportedManifestCount": 4,
+      "generatedCount": 4,
+      "syntaxPassCount": 4,
+      "success": true,
+      "failures": []
+    },
+    {
+      "id": "streetlights-mqtt",
+      "source": "AsyncAPI community examples",
+      "url": "https://raw.githubusercontent.com/asyncapi/spec/v2.6.0/examples/streetlights-mqtt.yml",
+      "asyncapiVersion": "2.6.0",
+      "channelCount": 4,
+      "messageCount": 4,
+      "manifestCount": 4,
+      "supportedManifestCount": 4,
+      "generatedCount": 4,
+      "syntaxPassCount": 4,
+      "success": true,
+      "failures": []
+    },
+    {
+      "id": "streetlights-operation-security",
+      "source": "AsyncAPI community examples",
+      "url": "https://raw.githubusercontent.com/asyncapi/spec/v2.6.0/examples/streetlights-operation-security.yml",
+      "asyncapiVersion": "2.6.0",
+      "channelCount": 4,
+      "messageCount": 4,
+      "manifestCount": 4,
+      "supportedManifestCount": 4,
+      "generatedCount": 4,
+      "syntaxPassCount": 4,
+      "success": true,
+      "failures": []
+    },
+    {
+      "id": "rpc-client-amqp",
+      "source": "AsyncAPI community examples",
+      "url": "https://raw.githubusercontent.com/asyncapi/spec/v2.6.0/examples/rpc-client.yml",
+      "asyncapiVersion": "2.6.0",
+      "channelCount": 2,
+      "messageCount": 2,
+      "manifestCount": 2,
+      "supportedManifestCount": 2,
+      "generatedCount": 2,
+      "syntaxPassCount": 2,
+      "success": true,
+      "failures": []
+    }
+  ],
+  "jsonPath": "/Users/systemsystems/portfolio/OSSP-Workbench/reports/real-world-asyncapi-validation.json",
+  "markdownPath": "/Users/systemsystems/portfolio/OSSP-Workbench/reports/real-world-asyncapi-validation.md"
+}

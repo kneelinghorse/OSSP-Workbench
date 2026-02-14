@@ -193,7 +193,17 @@ function createEventManifest(params) {
   const { urn, channel, messages, bindings, piiFields, document } = params;
 
   const info = document.info();
-  const primaryMessage = messages[0];
+  const serializationMetadata = extractSerializationMetadata(messages);
+  const deliveryContract = {
+    ...(bindings || {})
+  };
+
+  if (Object.keys(serializationMetadata).length > 0) {
+    deliveryContract.metadata = {
+      ...((bindings && bindings.metadata) || {}),
+      ...serializationMetadata
+    };
+  }
 
   return {
     protocol: 'event-protocol/v1',
@@ -223,7 +233,7 @@ function createEventManifest(params) {
       compatibility: { policy: 'backward' }
     },
     delivery: {
-      contract: bindings
+      contract: deliveryContract
     },
     governance: {
       policy: {
@@ -240,6 +250,78 @@ function createEventManifest(params) {
       importer_version: '0.1.0'
     }
   };
+}
+
+/**
+ * Extract serialization metadata from the primary AsyncAPI message.
+ * This metadata is consumed by generators to choose deserialization strategy.
+ * @param {Array} messages - AsyncAPI message objects
+ * @returns {Object} Serialization metadata
+ */
+function extractSerializationMetadata(messages) {
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return {};
+  }
+
+  const primaryMessage = messages[0];
+  const rawMessage = toRawMessage(primaryMessage);
+
+  const contentType = valueFromMessage(primaryMessage, 'contentType') || rawMessage.contentType || rawMessage.contentMediaType;
+  const schemaFormat = valueFromMessage(primaryMessage, 'schemaFormat') || rawMessage.schemaFormat || rawMessage.schema_format;
+  const schemaCompatibility = rawMessage['x-schema-compatibility'] || rawMessage['x-schema-compatibility-mode'];
+  const serializationFormat = inferSerializationFormat(contentType, schemaFormat);
+
+  const metadata = {};
+  if (contentType) metadata.contentType = contentType;
+  if (schemaFormat) metadata.schemaFormat = schemaFormat;
+  if (schemaCompatibility) metadata.schemaCompatibility = schemaCompatibility;
+  if (serializationFormat) metadata.serializationFormat = serializationFormat;
+
+  return metadata;
+}
+
+function valueFromMessage(message, methodName) {
+  try {
+    if (message && typeof message[methodName] === 'function') {
+      return message[methodName]();
+    }
+  } catch (error) {
+    return null;
+  }
+  return null;
+}
+
+function toRawMessage(message) {
+  if (!message) {
+    return {};
+  }
+
+  try {
+    if (typeof message.json === 'function') {
+      return message.json() || {};
+    }
+  } catch (error) {
+    return {};
+  }
+
+  return message;
+}
+
+function inferSerializationFormat(contentType, schemaFormat) {
+  const probe = `${contentType || ''} ${schemaFormat || ''}`.toLowerCase();
+  if (!probe) {
+    return 'json';
+  }
+  if (probe.includes('avro')) {
+    return 'avro';
+  }
+  if (probe.includes('protobuf') || probe.includes('proto')) {
+    return 'protobuf';
+  }
+  if (probe.includes('json')) {
+    return 'json';
+  }
+  return 'json';
 }
 
 /**

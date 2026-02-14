@@ -16,13 +16,17 @@ import { generateConsumerTest } from './test-generator.js';
  * @param {boolean} options.typescript - Generate TypeScript (default: true)
  * @param {boolean} options.includeTests - Generate test scaffold (default: true)
  * @param {boolean} options.includePIIUtil - Generate PII masking utility (default: true)
+ * @param {string} options.templateDir - Optional consumer template directory override
+ * @param {Record<string, string>} options.templateOverrides - Optional per-template file overrides
  * @returns {object} - Generated code files
  */
 function generateEventConsumer(manifest, options = {}) {
   const {
     typescript = true,
     includeTests = true,
-    includePIIUtil = true
+    includePIIUtil = true,
+    templateDir,
+    templateOverrides
   } = options;
 
   if (!manifest || !manifest.event) {
@@ -40,13 +44,13 @@ function generateEventConsumer(manifest, options = {}) {
   let generatorUsed;
 
   if (transport === 'kafka') {
-    consumerCode = generateKafkaConsumer(manifest, { typescript });
+    consumerCode = generateKafkaConsumer(manifest, { typescript, templateDir, templateOverrides });
     generatorUsed = 'kafka';
   } else if (transport === 'amqp') {
-    consumerCode = generateAMQPConsumer(manifest, { typescript });
+    consumerCode = generateAMQPConsumer(manifest, { typescript, templateDir, templateOverrides });
     generatorUsed = 'amqp';
   } else if (transport === 'mqtt') {
-    consumerCode = generateMQTTConsumer(manifest, { typescript });
+    consumerCode = generateMQTTConsumer(manifest, { typescript, templateDir, templateOverrides });
     generatorUsed = 'mqtt';
   } else {
     throw new Error(`Unsupported transport: ${transport}. Supported: kafka, amqp, mqtt`);

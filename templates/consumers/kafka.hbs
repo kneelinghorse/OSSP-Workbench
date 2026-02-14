@@ -1,0 +1,792 @@
+{{{imports}}}
+
+/**
+ * Consumer for {{eventName}}
+ * Purpose: {{purpose}}
+ *
+ * Governance:
+{{{governanceComments}}}
+ */
+export class {{className}}Consumer {
+  {{type.private}}kafka{{type.kafka}};
+  {{type.private}}consumer{{type.consumer}};
+{{#if useSchemaRegistry}}
+  {{type.private}}schemaRegistry{{type.schemaRegistry}} = null;
+  {{type.private}}schemaRegistryConfig{{type.schemaRegistryConfig}};
+{{/if}}
+  {{type.private}}monitoring{{type.monitoring}};
+  {{type.private}}auth{{type.auth}} = {};
+{{#if hasDLQ}}
+  {{type.private}}dlqProducer{{type.dlqProducer}} = null;
+{{/if}}
+{{#if enableResiliencePatterns}}
+  {{type.private}}poisonPillFailures{{type.poisonPillFailures}} = new Map();
+  {{type.private}}circuitState{{type.circuitState}} = {
+    state: 'closed',
+    consecutiveFailures: 0,
+    openedAt: null
+  };
+  {{type.private}}resilienceConfig{{type.resilienceConfig}};
+{{/if}}
+  {{type.private}}consumerOptions{{type.consumerOptions}};
+
+  constructor(config{{type.config}}) {
+    this.auth = config.auth || {};
+    this.consumerOptions = {
+      sessionTimeout: this.toNumber(config.sessionTimeout, process.env.KAFKA_SESSION_TIMEOUT, {{consumerDefaultSessionTimeoutMs}}),
+      heartbeatInterval: this.toNumber(config.heartbeatInterval, process.env.KAFKA_HEARTBEAT_INTERVAL, {{consumerDefaultHeartbeatIntervalMs}}),
+      rebalanceTimeout: this.toNumber(config.rebalanceTimeout, process.env.KAFKA_REBALANCE_TIMEOUT, {{consumerDefaultRebalanceTimeoutMs}}),
+      autoOffsetReset: this.normalizeOffsetReset(config.autoOffsetReset || process.env.KAFKA_AUTO_OFFSET_RESET || '{{consumerDefaultAutoOffsetReset}}'),
+      maxPollRecords: this.toNumber(config.maxPollRecords, process.env.KAFKA_MAX_POLL_RECORDS, {{consumerDefaultMaxPollRecords}}),
+      batchMode: this.normalizeBatchMode(config.batchMode || process.env.KAFKA_BATCH_MODE || '{{consumerDefaultBatchMode}}'),
+      batchMaxMessages: this.toNumber(config.batchMaxMessages, process.env.KAFKA_BATCH_MAX_MESSAGES, {{consumerDefaultBatchMaxMessages}}),
+      partitionAssignmentStrategy: this.resolvePartitionAssignmentStrategies(
+        config.partitionAssignmentStrategy ||
+        process.env.KAFKA_PARTITION_ASSIGNMENT_STRATEGY ||
+        '{{consumerDefaultPartitionAssignmentStrategies}}'
+      )
+    };
+
+    const kafkaConfig = this.buildKafkaConfig(config.brokers);
+    this.kafka = new Kafka(kafkaConfig);
+    const partitionAssigners = this.buildPartitionAssigners(this.consumerOptions.partitionAssignmentStrategy);
+
+    this.consumer = this.kafka.consumer({
+      groupId: config.groupId,
+      sessionTimeout: this.consumerOptions.sessionTimeout,
+      heartbeatInterval: this.consumerOptions.heartbeatInterval,
+      rebalanceTimeout: this.consumerOptions.rebalanceTimeout,
+      ...(partitionAssigners ? { partitionAssigners } : {})
+    });
+
+    this.monitoring = config.monitoring || { enabled: false };
+{{#if enableResiliencePatterns}}
+    this.resilienceConfig = {
+      enabled: config.retry?.enabled ?? true,
+      retry: {
+        maxRetries: this.toNumber(config.retry?.maxRetries, process.env.KAFKA_RETRY_MAX_RETRIES, {{retryMaxRetriesDefault}}, true),
+        backoffMs: this.toNumber(config.retry?.backoffMs, process.env.KAFKA_RETRY_BACKOFF_MS, {{retryBackoffMsDefault}}),
+        backoffMultiplier: this.toNumber(config.retry?.backoffMultiplier, process.env.KAFKA_RETRY_BACKOFF_MULTIPLIER, {{retryBackoffMultiplierDefault}}),
+        maxBackoffMs: this.toNumber(config.retry?.maxBackoffMs, process.env.KAFKA_RETRY_MAX_BACKOFF_MS, 60000),
+        poisonPillMaxRetries: this.toNumber(
+          config.retry?.poisonPillMaxRetries,
+          process.env.KAFKA_POISON_PILL_MAX_RETRIES,
+          {{poisonPillMaxRetriesDefault}}
+        )
+      },
+      circuitBreaker: {
+        enabled: config.circuitBreaker?.enabled ?? true,
+        failureThreshold: this.toNumber(
+          config.circuitBreaker?.failureThreshold,
+          process.env.KAFKA_CIRCUIT_BREAKER_THRESHOLD,
+          {{circuitBreakerFailureThresholdDefault}}
+        ),
+        resetTimeoutMs: this.toNumber(
+          config.circuitBreaker?.resetTimeoutMs,
+          process.env.KAFKA_CIRCUIT_BREAKER_RESET_TIMEOUT_MS,
+          {{circuitBreakerResetTimeoutMsDefault}}
+        )
+      }
+    };
+{{/if}}
+{{#if useSchemaRegistry}}
+    this.schemaRegistryConfig = {
+      enabled: config.schemaRegistry?.enabled ?? true,
+      host: config.schemaRegistry?.host || process.env.SCHEMA_REGISTRY_URL || process.env.KAFKA_SCHEMA_REGISTRY_URL || '',
+      username: config.schemaRegistry?.username || process.env.SCHEMA_REGISTRY_USERNAME || '',
+      password: config.schemaRegistry?.password || process.env.SCHEMA_REGISTRY_PASSWORD || '',
+      compatibility: this.normalizeSchemaCompatibility(
+        config.schemaRegistry?.compatibility || process.env.SCHEMA_REGISTRY_COMPATIBILITY || '{{schemaCompatibility}}'
+      ),
+      readerSchema: this.parseReaderSchema(config.schemaRegistry?.readerSchema || process.env.SCHEMA_REGISTRY_READER_SCHEMA)
+    };
+    this.schemaRegistry = this.createSchemaRegistryClient();
+{{/if}}
+  }
+
+  {{type.private}}toNumber(value{{type.value}}, envValue{{type.value}}, fallback{{type.number}}, allowZero{{type.value}} = false){{type.numberReturn}} {
+    const normalized = value ?? envValue;
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) && (allowZero ? parsed >= 0 : parsed > 0) ? parsed : fallback;
+  }
+
+  {{type.private}}isTruthy(value{{type.value}}){{type.boolReturn}} {
+    return ['1', 'true', 'yes', 'on'].includes(String(value || '').toLowerCase());
+  }
+
+  {{type.private}}normalizeOffsetReset(value{{type.value}}){{type.string}} {
+    const normalized = String(value || '').toLowerCase().trim();
+    if (normalized === 'earliest' || normalized === 'latest' || normalized === 'none') {
+      return normalized;
+    }
+    return 'latest';
+  }
+
+  {{type.private}}normalizeBatchMode(value{{type.value}}){{type.string}} {
+    return String(value || '').toLowerCase().trim() === 'batch' ? 'batch' : 'message';
+  }
+
+  {{type.private}}resolvePartitionAssignmentStrategies(value{{type.value}}){{type.any}} {
+    const rawValues = Array.isArray(value) ? value : String(value || '').split(',');
+    const normalized = [];
+
+    for (const item of rawValues) {
+      const token = String(item || '').toLowerCase().trim();
+      if (!token) {
+        continue;
+      }
+
+      const canonical = (
+        token === 'round-robin' ||
+        token === 'round_robin' ||
+        token === 'roundrobin'
+      )
+        ? 'roundrobin'
+        : token;
+
+      if (!normalized.includes(canonical)) {
+        normalized.push(canonical);
+      }
+    }
+
+    return normalized.length > 0 ? normalized : ['roundrobin'];
+  }
+
+  {{type.private}}buildPartitionAssigners(strategies{{type.any}}){{type.any}} {
+    const normalized = this.resolvePartitionAssignmentStrategies(strategies);
+    const assigners = [];
+
+    if (normalized.includes('roundrobin') && typeof PartitionAssigners?.roundRobin === 'function') {
+      assigners.push(PartitionAssigners.roundRobin);
+    }
+
+    return assigners.length > 0 ? assigners : undefined;
+  }
+
+{{#if enableResiliencePatterns}}
+  {{type.private}}{{type.method}}sleep(ms{{type.number}}){{type.return}} {
+    await new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  {{type.private}}resolveMessageIdentity(payload{{type.payload}}){{type.string}} {
+    const topic = payload?.topic || '{{topic}}';
+    const partition = payload?.partition ?? 'unknown';
+    const offset = payload?.message?.offset ?? 'unknown';
+    return `${topic}:${partition}:${offset}`;
+  }
+
+  {{type.private}}isDeserializationError(error{{type.error}}){{type.boolReturn}} {
+    const message = String(error?.message || '').toLowerCase();
+    return message.includes('deserialize') || message.includes('schema registry decode failed');
+  }
+
+  {{type.private}}trackPoisonPillFailure(messageKey{{type.string}}){{type.numberReturn}} {
+    const nextCount = (this.poisonPillFailures.get(messageKey) || 0) + 1;
+    this.poisonPillFailures.set(messageKey, nextCount);
+    return nextCount;
+  }
+
+  {{type.private}}clearPoisonPillFailure(messageKey{{type.string}}){{type.voidReturn}} {
+    this.poisonPillFailures.delete(messageKey);
+  }
+
+  {{type.private}}calculateRetryDelay(attempt{{type.number}}){{type.numberReturn}} {
+    const retryConfig = this.resilienceConfig.retry;
+    const baseDelay = retryConfig.backoffMs * Math.pow(retryConfig.backoffMultiplier, attempt);
+    return Math.min(baseDelay, retryConfig.maxBackoffMs);
+  }
+
+  {{type.private}}shouldUseCircuitBreaker(){{type.boolReturn}} {
+    return this.resilienceConfig.enabled && this.resilienceConfig.circuitBreaker.enabled;
+  }
+
+  {{type.private}}{{type.method}}ensureCircuitCanExecute(){{type.return}} {
+    if (!this.shouldUseCircuitBreaker()) {
+      return;
+    }
+
+    if (this.circuitState.state !== 'open') {
+      return;
+    }
+
+    const openedAt = this.circuitState.openedAt || 0;
+    const elapsed = Date.now() - openedAt;
+    if (elapsed >= this.resilienceConfig.circuitBreaker.resetTimeoutMs) {
+      this.circuitState.state = 'half_open';
+      this.circuitState.consecutiveFailures = 0;
+      await this.log('warn', 'circuit_breaker_half_open', {
+        message: 'Circuit breaker moved to half-open',
+        elapsedMs: elapsed
+      });
+      return;
+    }
+
+    throw new Error('Circuit breaker is open. Processing temporarily paused.');
+  }
+
+  {{type.private}}{{type.method}}registerProcessingFailure(error{{type.error}}){{type.return}} {
+    if (!this.shouldUseCircuitBreaker()) {
+      return;
+    }
+
+    this.circuitState.consecutiveFailures += 1;
+
+    if (this.circuitState.consecutiveFailures >= this.resilienceConfig.circuitBreaker.failureThreshold) {
+      this.circuitState.state = 'open';
+      this.circuitState.openedAt = Date.now();
+      await this.log('warn', 'circuit_breaker_opened', {
+        message: 'Circuit breaker opened after repeated failures',
+        failureCount: this.circuitState.consecutiveFailures,
+        threshold: this.resilienceConfig.circuitBreaker.failureThreshold,
+        reason: error?.message || String(error)
+      });
+    }
+  }
+
+  {{type.private}}registerProcessingSuccess(){{type.voidReturn}} {
+    if (!this.shouldUseCircuitBreaker()) {
+      return;
+    }
+
+    this.circuitState.consecutiveFailures = 0;
+    this.circuitState.openedAt = null;
+    this.circuitState.state = 'closed';
+  }
+
+  {{type.private}}{{type.method}}executeWithRetry(payload{{type.payload}}, operation{{type.any}}){{type.return}} {
+    if (!this.resilienceConfig.enabled) {
+      await operation();
+      return;
+    }
+
+    const maxRetries = this.resilienceConfig.retry.maxRetries;
+    let attempt = 0;
+
+    while (attempt <= maxRetries) {
+      try {
+        await this.ensureCircuitCanExecute();
+        await operation();
+        this.registerProcessingSuccess();
+        return;
+      } catch (error) {
+        await this.registerProcessingFailure(error);
+
+        if (attempt >= maxRetries) {
+          throw error;
+        }
+
+        const retryDelay = this.calculateRetryDelay(attempt);
+        await this.log('warn', 'message_retry_scheduled', {
+          message: 'Retrying failed message processing',
+          attempt: attempt + 1,
+          maxRetries,
+          retryDelayMs: retryDelay,
+          policy: '{{retryPolicy}}',
+          error: error?.message || String(error)
+        });
+
+        await this.sleep(retryDelay);
+        attempt += 1;
+      }
+    }
+  }
+{{/if}}
+
+{{#if useSchemaRegistry}}
+  {{type.private}}normalizeSchemaCompatibility(value{{type.value}}){{type.string}} {
+    const normalized = String(value || '')
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z]/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_+|_+$/g, '');
+
+    const supported = new Set([
+      'NONE',
+      'BACKWARD',
+      'FORWARD',
+      'FULL',
+      'BACKWARD_TRANSITIVE',
+      'FORWARD_TRANSITIVE',
+      'FULL_TRANSITIVE'
+    ]);
+
+    return supported.has(normalized) ? normalized : '{{schemaCompatibility}}';
+  }
+
+  {{type.private}}parseReaderSchema(value{{type.value}}){{type.any}} {
+    if (value == null || value === '') {
+      return null;
+    }
+
+    if (typeof value === 'object') {
+      return value;
+    }
+
+    if (typeof value !== 'string') {
+      return null;
+    }
+
+    try {
+      return JSON.parse(value);
+    } catch (error) {
+      throw new Error('Invalid schema registry reader schema JSON in SCHEMA_REGISTRY_READER_SCHEMA');
+    }
+  }
+
+  {{type.private}}createSchemaRegistryClient(){{type.any}} {
+    if (!this.schemaRegistryConfig.enabled) {
+      return null;
+    }
+
+    if (!this.schemaRegistryConfig.host) {
+      throw new Error('Schema Registry URL is required for Avro/Protobuf deserialization. Set schemaRegistry.host or SCHEMA_REGISTRY_URL.');
+    }
+
+    const clientConfig = {
+      host: this.schemaRegistryConfig.host
+    };
+
+    if (this.schemaRegistryConfig.username && this.schemaRegistryConfig.password) {
+      clientConfig.auth = {
+        username: this.schemaRegistryConfig.username,
+        password: this.schemaRegistryConfig.password
+      };
+    }
+
+    return new SchemaRegistry(clientConfig);
+  }
+
+  {{type.private}}buildSchemaDecodeOptions(){{type.any}} {
+{{#if isAvroDeserializer}}
+    if (this.schemaRegistryConfig.readerSchema) {
+      return {
+        [SchemaType.AVRO]: {
+          readerSchema: this.schemaRegistryConfig.readerSchema
+        }
+      };
+    }
+{{/if}}
+    return undefined;
+  }
+
+  {{type.private}}isConfluentWireFormat(buffer{{type.buffer}}){{type.boolReturn}} {
+    return Buffer.isBuffer(buffer) && buffer.length > 5 && buffer[0] === 0;
+  }
+{{/if}}
+
+  {{type.private}}{{type.method}}deserializeMessageValue(value{{type.value}}){{type.anyReturn}} {
+    if (value == null) {
+      return {};
+    }
+
+    const messageBuffer = Buffer.isBuffer(value) ? value : Buffer.from(String(value));
+{{#if useSchemaRegistry}}
+    if (this.schemaRegistry) {
+      const decodeOptions = this.buildSchemaDecodeOptions();
+      try {
+        return await this.schemaRegistry.decode(messageBuffer, decodeOptions);
+      } catch (error) {
+        const hasConfluentWirePrefix = this.isConfluentWireFormat(messageBuffer);
+        await this.log('warn', 'schema_registry_decode_failed', {
+          message: 'Schema Registry decode failed, attempting JSON fallback',
+          error: error?.message || String(error),
+          compatibility: this.schemaRegistryConfig.compatibility,
+          hasConfluentWirePrefix
+        });
+
+        if (hasConfluentWirePrefix) {
+          throw error;
+        }
+      }
+    }
+{{/if}}
+
+    const rawValue = messageBuffer.toString('utf8').trim();
+    if (!rawValue) {
+      return {};
+    }
+
+    try {
+      return JSON.parse(rawValue);
+    } catch (error) {
+      throw new Error(`Failed to deserialize Kafka payload as {{schemaEncodingLabel}}/JSON: ${error?.message || String(error)}`);
+    }
+  }
+
+  {{type.private}}buildKafkaConfig(brokers{{type.brokersParam}}){{type.kafkaConfigReturn}} {
+    const kafkaConfig = {
+      clientId: '{{eventName}}-consumer',
+      brokers
+    };
+
+    const sslConfig = this.buildSSLConfig();
+    if (sslConfig) {
+      kafkaConfig.ssl = sslConfig;
+    }
+
+    const saslConfig = this.buildSaslConfig();
+    if (saslConfig) {
+      kafkaConfig.sasl = saslConfig;
+    }
+
+    return kafkaConfig;
+  }
+
+  {{type.private}}buildSSLConfig(){{type.any}} {
+    const authMode = String(this.auth?.mode || process.env.KAFKA_AUTH_MODE || 'none').toLowerCase();
+    const sslEnabled = {{#if includeMtls}}authMode === 'mtls' || {{/if}}this.auth?.ssl?.enabled === true || this.isTruthy(process.env.KAFKA_SSL_ENABLED);
+    if (!sslEnabled) {
+      return null;
+    }
+
+    const ca = this.auth?.ssl?.ca || process.env.KAFKA_SSL_CA;
+    const cert = this.auth?.ssl?.cert || process.env.KAFKA_SSL_CERT;
+    const key = this.auth?.ssl?.key || process.env.KAFKA_SSL_KEY;
+
+    const sslConfig = {
+      rejectUnauthorized: this.auth?.ssl?.rejectUnauthorized ?? !this.isTruthy(process.env.KAFKA_SSL_INSECURE)
+    };
+
+    if (ca) {
+      sslConfig.ca = [ca];
+    }
+    if (cert) {
+      sslConfig.cert = cert;
+    }
+    if (key) {
+      sslConfig.key = key;
+    }
+
+    return sslConfig;
+  }
+
+  {{type.private}}buildSaslConfig(){{type.any}} {
+    const authMode = String(this.auth?.mode || process.env.KAFKA_AUTH_MODE || 'none').toLowerCase();
+    const username = this.auth?.username || process.env.KAFKA_SASL_USERNAME;
+    const password = this.auth?.password || process.env.KAFKA_SASL_PASSWORD;
+
+    switch (authMode) {
+{{#if includeScram256}}      case 'scram256':
+      case 'scram-sha-256':
+      case 'sasl/scram-256':
+        if (!username || !password) return null;
+        return { mechanism: 'scram-sha-256', username, password };
+{{/if}}{{#if includeScram512}}      case 'scram512':
+      case 'scram-sha-512':
+      case 'sasl/scram-512':
+        if (!username || !password) return null;
+        return { mechanism: 'scram-sha-512', username, password };
+{{/if}}{{#if includePlain}}      case 'plain':
+      case 'sasl/plain':
+        if (!username || !password) return null;
+        return { mechanism: 'plain', username, password };
+{{/if}}{{#if includeOAuth}}      case 'oauth':
+      case 'oauthbearer': {
+        const token = this.auth?.oauth?.token || process.env.KAFKA_OAUTH_BEARER_TOKEN;
+        if (!token) return null;
+        return {
+          mechanism: 'oauthbearer',
+          oauthBearerProvider: async () => ({ value: token })
+        };
+      }
+{{/if}}      default:
+        return null;
+    }
+  }
+
+  {{type.private}}isMonitoringEnabled(){{type.boolReturn}} {
+    return this.monitoring?.enabled === true;
+  }
+
+  {{type.private}}{{type.method}}log(level{{type.string}}, event{{type.string}}, data{{type.object}} = {}){{type.return}} {
+    const payload = {
+      timestamp: new Date().toISOString(),
+      level,
+      event,
+      transport: 'kafka',
+      consumer: '{{className}}Consumer',
+      ...data
+    };
+
+    if (this.isMonitoringEnabled()) {
+      const logger = this.monitoring?.logger;
+      if (logger && typeof logger[level] === 'function') {
+        logger[level](payload);
+        return;
+      }
+
+      const serialized = JSON.stringify(payload);
+      if (level === 'error') {
+        console.error(serialized);
+      } else {
+        console.log(serialized);
+      }
+      return;
+    }
+
+    if (level === 'error') {
+      console.error(payload.message || event, payload.error || '');
+      return;
+    }
+
+    console.log(payload.message || event, payload.payload || '');
+  }
+
+  {{type.private}}startSpan(spanName{{type.string}}, attributes{{type.object}} = {}){{type.any}} {
+    if (!this.isMonitoringEnabled()) {
+      return null;
+    }
+
+    const tracer = this.monitoring?.tracer;
+    if (!tracer || typeof tracer.startSpan !== 'function') {
+      return null;
+    }
+
+    return tracer.startSpan(spanName, { attributes });
+  }
+
+  {{type.private}}recordSuccessMetrics(durationMs{{type.number}}, payload{{type.payload}}){{type.voidReturn}} {
+    if (!this.isMonitoringEnabled()) {
+      return;
+    }
+
+    const metrics = this.monitoring?.metrics;
+    metrics?.incrementMessagesProcessed?.({
+      transport: 'kafka',
+      topic: '{{topic}}',
+      event: '{{eventName}}'
+    });
+    metrics?.observeLatency?.(durationMs, {
+      transport: 'kafka',
+      topic: '{{topic}}',
+      event: '{{eventName}}'
+    });
+
+    const highWatermark = Number(payload?.batch?.highWatermark || 0);
+    const currentOffset = Number(payload?.message?.offset || 0);
+    if (Number.isFinite(highWatermark) && Number.isFinite(currentOffset) && highWatermark >= currentOffset) {
+      metrics?.setConsumerLag?.(highWatermark - currentOffset, {
+        transport: 'kafka',
+        topic: '{{topic}}',
+        event: '{{eventName}}'
+      });
+    }
+  }
+
+  {{type.private}}recordErrorMetrics(durationMs{{type.number}}){{type.voidReturn}} {
+    if (!this.isMonitoringEnabled()) {
+      return;
+    }
+
+    const metrics = this.monitoring?.metrics;
+    metrics?.incrementErrors?.({
+      transport: 'kafka',
+      topic: '{{topic}}',
+      event: '{{eventName}}'
+    });
+    metrics?.observeLatency?.(durationMs, {
+      transport: 'kafka',
+      topic: '{{topic}}',
+      event: '{{eventName}}',
+      outcome: 'error'
+    });
+  }
+
+  {{type.method}}start(){{type.return}} {
+    await this.consumer.connect();
+{{#if hasDLQ}}
+    await this.ensureDLQProducerConnected();
+{{/if}}
+    await this.consumer.subscribe({
+      topic: '{{topic}}',
+      fromBeginning: this.consumerOptions.autoOffsetReset === 'earliest'
+    });
+
+    await this.log('info', 'consumer_started', {
+      message: 'Kafka consumer started',
+      topic: '{{topic}}',
+      autoOffsetReset: this.consumerOptions.autoOffsetReset,
+      maxPollRecords: this.consumerOptions.maxPollRecords,
+      batchMode: this.consumerOptions.batchMode,
+      batchMaxMessages: this.consumerOptions.batchMaxMessages,
+      partitionAssignmentStrategy: this.consumerOptions.partitionAssignmentStrategy,
+      schemaEncoding: '{{schemaEncodingLabel}}'{{#if useSchemaRegistry}},
+      schemaRegistryEnabled: this.schemaRegistryConfig.enabled,
+      schemaCompatibility: this.schemaRegistryConfig.compatibility{{/if}}{{#if enableResiliencePatterns}},
+      retryPolicy: '{{retryPolicy}}',
+      retryEnabled: this.resilienceConfig.enabled,
+      retryMaxRetries: this.resilienceConfig.retry.maxRetries,
+      retryBackoffMs: this.resilienceConfig.retry.backoffMs,
+      circuitBreakerEnabled: this.resilienceConfig.circuitBreaker.enabled{{/if}}
+    });
+
+    const runConfig = {
+      partitionsConsumedConcurrently: Math.max(1, Math.min(this.consumerOptions.maxPollRecords, 16))
+    };
+
+    if (this.consumerOptions.batchMode === 'batch') {
+      runConfig.eachBatchAutoResolve = false;
+      runConfig.eachBatch = async ({ batch, resolveOffset, heartbeat, commitOffsetsIfNecessary, isRunning, isStale }) => {
+        const batchMessages = Array.isArray(batch?.messages) ? batch.messages : [];
+        const maxMessages = Math.max(1, this.consumerOptions.batchMaxMessages);
+        const messagesToProcess = batchMessages.slice(0, maxMessages);
+
+        for (const message of messagesToProcess) {
+          if (typeof isRunning === 'function' && !isRunning()) {
+            break;
+          }
+          if (typeof isStale === 'function' && isStale()) {
+            break;
+          }
+
+          await this.processPayload({
+            topic: batch.topic,
+            partition: batch.partition,
+            message,
+            batch
+          });
+
+          if (typeof resolveOffset === 'function') {
+            resolveOffset(message.offset);
+          }
+          if (typeof heartbeat === 'function') {
+            await heartbeat();
+          }
+        }
+
+        if (typeof commitOffsetsIfNecessary === 'function') {
+          await commitOffsetsIfNecessary();
+        }
+      };
+    } else {
+      runConfig.eachMessage = async (payload{{type.payload}}) => {
+        await this.processPayload(payload);
+      };
+    }
+
+    await this.consumer.run(runConfig);
+  }
+
+  {{type.private}}{{type.method}}processPayload(payload{{type.payload}}){{type.return}} {
+    const startedAt = Date.now();
+    const span = this.startSpan('consumer.process_message', {
+      transport: 'kafka',
+      topic: '{{topic}}',
+      event: '{{eventName}}'
+    });
+
+    try {
+{{#if enableResiliencePatterns}}
+      await this.executeWithRetry(payload, async () => {
+        await this.handleMessage(payload);
+      });
+{{else}}
+      await this.handleMessage(payload);
+{{/if}}
+      this.recordSuccessMetrics(Date.now() - startedAt, payload);
+      span?.setStatus?.({ code: 1 });
+    } catch (error) {
+      this.recordErrorMetrics(Date.now() - startedAt);
+      span?.recordException?.(error);
+      span?.setStatus?.({
+        code: 2,
+        message: error?.message || 'processing_failed'
+      });
+      await this.handleError(error{{{errorCast}}}, payload);
+    } finally {
+      span?.end?.();
+    }
+  }
+
+  {{type.private}}{{type.method}}handleMessage(payload{{type.payload}}){{type.return}} {
+    const { message } = payload;
+{{#if enableResiliencePatterns}}
+    const messageKey = this.resolveMessageIdentity(payload);
+    let event;
+
+    try {
+      event = await this.deserializeMessageValue(message.value);
+      this.clearPoisonPillFailure(messageKey);
+    } catch (error) {
+      if (!this.isDeserializationError(error{{{errorCast}}})) {
+        throw error;
+      }
+
+      const failureCount = this.trackPoisonPillFailure(messageKey);
+      const maxRetries = this.resilienceConfig.retry.poisonPillMaxRetries;
+
+      await this.log('warn', 'poison_pill_retry', {
+        message: 'Undeserializable payload detected',
+        messageKey,
+        failureCount,
+        maxRetries,
+        error: error?.message || String(error)
+      });
+
+      if (failureCount >= maxRetries) {
+        await this.handlePoisonPill(payload, error{{{errorCast}}}, messageKey, failureCount);
+        this.clearPoisonPillFailure(messageKey);
+        return;
+      }
+
+      throw error;
+    }
+{{else}}
+    const event = await this.deserializeMessageValue(message.value);
+{{/if}}
+
+{{{maskingBlock}}}
+    // TODO: Implement business logic
+
+    // Commit offset after successful processing
+    // (Kafka auto-commits by default, explicit commit for at-least-once)
+  }
+
+{{#if enableResiliencePatterns}}
+  {{type.private}}{{type.method}}handlePoisonPill(payload{{type.payload}}, error{{type.error}}, messageKey{{type.string}}, failureCount{{type.number}}){{type.return}} {
+    await this.log('warn', 'poison_pill_skipped', {
+      message: 'Skipping poison-pill payload after retry threshold',
+      messageKey,
+      failureCount,
+      maxRetries: this.resilienceConfig.retry.poisonPillMaxRetries,
+      error: error?.message || String(error)
+    });
+
+{{#if hasDLQ}}
+    await this.sendToDLQ(payload, error);
+{{else}}
+    await this.log('warn', 'poison_pill_no_dlq', {
+      message: 'Poison-pill payload dropped because DLQ is not configured',
+      messageKey
+    });
+{{/if}}
+  }
+{{/if}}
+
+  {{type.private}}{{type.method}}handleError(error{{type.error}}, payload{{type.payload}}){{type.return}} {
+    await this.log('error', 'message_failed', {
+      message: 'Error processing message',
+      error: error?.message || String(error),
+      stack: error?.stack
+    });
+
+{{{dlqBranch}}}  }
+
+{{{dlqMethod}}}  {{type.method}}stop(){{type.return}} {
+{{#if enableResiliencePatterns}}
+    this.poisonPillFailures.clear();
+{{/if}}
+{{#if hasDLQ}}
+    if (this.dlqProducer) {
+      await this.dlqProducer.disconnect();
+      this.dlqProducer = null;
+    }
+{{/if}}
+    await this.consumer.disconnect();
+    await this.log('info', 'consumer_stopped', {
+      message: 'Kafka consumer stopped',
+      topic: '{{topic}}'
+    });
+  }
+}

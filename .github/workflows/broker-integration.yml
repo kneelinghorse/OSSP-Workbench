@@ -1,0 +1,33 @@
+name: Broker Integration Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+jobs:
+  broker-integration:
+    name: Kafka/RabbitMQ/Mosquitto + Schema Registry
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Show Docker info
+        run: docker info
+
+      - name: Run broker integration suite
+        run: npm run test:integration:brokers
