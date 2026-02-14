@@ -1,0 +1,86 @@
+{
+  "generatedAt": "2026-02-14T03:53:36.822Z",
+  "fixtureCorpus": {
+    "fixtureCount": 11,
+    "fixtureIds": [
+      "streetlights-kafka",
+      "streetlights-mqtt",
+      "streetlights-operation-security",
+      "rpc-client-amqp",
+      "kafka-events-fixture",
+      "kafka-patterns-fixture",
+      "kafka-schema-registry-fixture",
+      "amqp-notifications-fixture",
+      "amqp-patterns-fixture",
+      "mqtt-patterns-fixture",
+      "mqtt-telemetry-fixture"
+    ]
+  },
+  "soak": {
+    "iterations": 3,
+    "fixtureRuns": 33,
+    "generatedManifests": 93,
+    "importTimeoutMs": 60000
+  },
+  "metrics": {
+    "importMs": {
+      "count": 33,
+      "min": 31.19425000000001,
+      "max": 302.702958,
+      "mean": 44.030919242424226,
+      "p50": 35.42795899999999,
+      "p95": 58.47950000000003
+    },
+    "generationMs": {
+      "count": 93,
+      "min": 1.8740000000000236,
+      "max": 15.866209000000026,
+      "mean": 3.6158153763440852,
+      "p50": 3.56245899999999,
+      "p95": 5.399541999999997
+    },
+    "memoryMb": {
+      "count": 33,
+      "min": 36.89990234375,
+      "max": 131.28170776367188,
+      "mean": 82.47538988517992,
+      "p95": 116.13038635253906
+    },
+    "failures": {
+      "count": 0,
+      "rate": 0,
+      "samples": []
+    }
+  },
+  "perIteration": [
+    {
+      "iteration": 1,
+      "fixtureRuns": 11,
+      "importMsTotal": 686.993669,
+      "generationMsTotal": 133.79412200000002,
+      "generatedManifests": 31,
+      "failures": 0
+    },
+    {
+      "iteration": 2,
+      "fixtureRuns": 11,
+      "importMsTotal": 400.15054099999986,
+      "generationMsTotal": 104.31824999999981,
+      "generatedManifests": 31,
+      "failures": 0
+    },
+    {
+      "iteration": 3,
+      "fixtureRuns": 11,
+      "importMsTotal": 365.8761249999998,
+      "generationMsTotal": 98.15845800000011,
+      "generatedManifests": 31,
+      "failures": 0
+    }
+  ],
+  "environment": {
+    "nodeVersion": "v24.6.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  }
+}

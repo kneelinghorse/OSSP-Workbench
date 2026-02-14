@@ -1,0 +1,7 @@
+{
+  "iterationsMin": 3,
+  "maxFailureRate": 0,
+  "importP95Ms": 1000,
+  "generationP95Ms": 100,
+  "maxHeapMB": 250
+}

@@ -28,6 +28,8 @@
     "test:ci": "jest --ci --coverage --maxWorkers=2 --testTimeout=30000",
     "test:fast": "jest --config ./jest.fast.config.js --ci --maxWorkers=2 --testTimeout=20000",
     "test:packaging": "jest --runTestsByPath tests/distribution/npm-package.test.ts --ci --runInBand",
+    "test:golden:compat": "jest --runTestsByPath tests/generators/consumer-golden-compatibility.test.js --ci --runInBand",
+    "test:golden:update": "node scripts/validation/update-golden-consumers.js",
     "test:integration:brokers": "RUN_BROKER_INTEGRATION=1 jest --runTestsByPath tests/integration/broker-testcontainers.integration.test.ts --ci --runInBand --testTimeout=300000",
     "generate:sprint-summary": "tsx ./scripts/reports/sprint-summary-generator.ts",
     "test:esm:probe": "jest -c ./jest.esm.ci.js --runTestsByPath tests/_probe/esm.sample.test.ts",
@@ -46,7 +48,12 @@
     "ci:full": "npm run check:boundaries && npm run test:ci && npm run test:performance && npm run docker:build",
     "probe:pre12": "node scripts/probe/pre12.collect.js all",
     "test:e2e:mcp": "jest --runTestsByPath tests/e2e/mcp.e2e.test.ts",
-    "validate:asyncapi:realworld": "node scripts/validation/real-world-asyncapi-validation.js"
+    "validate:asyncapi:realworld": "node scripts/validation/real-world-asyncapi-validation.js",
+    "validate:soak:performance": "node scripts/validation/consumer-soak-performance.js",
+    "check:soak:budget": "node scripts/ci/consumer-soak-budget.js",
+    "ci:nightly:soak": "npm run validate:soak:performance && npm run check:soak:budget",
+    "release:sbom": "node scripts/release/generate-sbom.js",
+    "release:gate": "npm run test:packaging && npm run test:golden:compat && npm run validate:asyncapi:realworld && SOAK_ITERATIONS=3 npm run validate:soak:performance && npm run check:soak:budget && npm audit --omit=dev --audit-level=high && npm run release:sbom && npm pack --dry-run"
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "^10.0.3",

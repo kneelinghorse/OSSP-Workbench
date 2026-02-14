@@ -1,0 +1,75 @@
+asyncapi: '2.6.0'
+info:
+  title: Kafka Pattern Validation Fixture
+  version: '1.0.0'
+  description: AsyncAPI 2.6 fixture for retry, DLQ, and ordering pattern detection.
+
+servers:
+  production:
+    url: kafka://kafka.example.com:9092
+    protocol: kafka
+
+channels:
+  user.events.deleted:
+    bindings:
+      kafka:
+        topic: user.events.deleted
+        partitions: 3
+        configs:
+          retries: 5
+          retry.backoff.ms: 3000
+    publish:
+      message:
+        name: UserDeleted
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            userId:
+              type: string
+            deletedAt:
+              type: string
+              format: date-time
+
+  user.events.updated:
+    bindings:
+      kafka:
+        topic: user.events.updated
+        partitions: 6
+        configs:
+          retries: 5
+          retry.backoff.ms: 5000
+          dead.letter.queue.topic.name: user.events.updated.dlq
+          enable.idempotence: true
+    publish:
+      message:
+        name: UserUpdated
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            userId:
+              type: string
+            email:
+              type: string
+              format: email
+
+  analytics.events.tracked:
+    bindings:
+      kafka:
+        topic: analytics.events.tracked
+        partitions: 10
+        configs:
+          retries: 3
+    publish:
+      message:
+        name: AnalyticsTracked
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            eventId:
+              type: string
+            occurredAt:
+              type: string
+              format: date-time

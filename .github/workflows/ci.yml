@@ -32,6 +32,9 @@ jobs:
       - name: Run fast test suite
         run: npm run test:fast
 
+      - name: Run consumer golden compatibility checks
+        run: npm run test:golden:compat
+
       - name: Run MCP smoke tests
         run: npm run test:e2e:mcp
 

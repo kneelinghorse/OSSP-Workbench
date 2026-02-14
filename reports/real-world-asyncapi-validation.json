@@ -1,20 +1,51 @@
 {
-  "runId": "2026-02-14T03-10-08-114Z",
-  "generatedAt": "2026-02-14T03:10:09.615Z",
+  "runId": "2026-02-14T03-53-32-997Z",
+  "generatedAt": "2026-02-14T03:53:34.839Z",
   "summary": {
-    "specsTested": 4,
-    "specsPassed": 4,
+    "fixturesTracked": 11,
+    "specsTested": 11,
+    "specsPassed": 11,
     "importFailures": 0,
     "generationFailures": 0,
     "syntaxFailures": 0,
-    "supportedManifests": 14,
-    "generatedManifests": 14
+    "supportedManifests": 31,
+    "generatedManifests": 31,
+    "generatedByTransport": {
+      "kafka": 15,
+      "amqp": 7,
+      "mqtt": 9
+    },
+    "profileCounts": {
+      "public-pinned": 4,
+      "edge-case": 7
+    },
+    "transportHintCounts": {
+      "kafka": 5,
+      "mqtt": 3,
+      "amqp": 3
+    },
+    "edgeCaseCoverage": {
+      "schema-registry": true,
+      "security-auth": true,
+      "routing-complexity": true
+    }
   },
   "specResults": [
     {
       "id": "streetlights-kafka",
-      "source": "AsyncAPI community examples",
-      "url": "https://raw.githubusercontent.com/asyncapi/spec/v2.6.0/examples/streetlights-kafka.yml",
+      "profile": "public-pinned",
+      "source": "AsyncAPI community examples (pinned mirror)",
+      "sourceType": "local",
+      "sourceLocation": "tests/fixtures/asyncapi/public/streetlights-kafka.yml",
+      "upstreamUrl": "https://raw.githubusercontent.com/asyncapi/spec/v2.6.0/examples/streetlights-kafka.yml",
+      "transportHints": [
+        "kafka"
+      ],
+      "tags": [
+        "public",
+        "security-auth",
+        "routing-complexity"
+      ],
       "asyncapiVersion": "2.6.0",
       "channelCount": 4,
       "messageCount": 4,
@@ -22,13 +53,28 @@
       "supportedManifestCount": 4,
       "generatedCount": 4,
       "syntaxPassCount": 4,
+      "generatedByTransport": {
+        "kafka": 4,
+        "amqp": 0,
+        "mqtt": 0
+      },
       "success": true,
       "failures": []
     },
     {
       "id": "streetlights-mqtt",
-      "source": "AsyncAPI community examples",
-      "url": "https://raw.githubusercontent.com/asyncapi/spec/v2.6.0/examples/streetlights-mqtt.yml",
+      "profile": "public-pinned",
+      "source": "AsyncAPI community examples (pinned mirror)",
+      "sourceType": "local",
+      "sourceLocation": "tests/fixtures/asyncapi/public/streetlights-mqtt.yml",
+      "upstreamUrl": "https://raw.githubusercontent.com/asyncapi/spec/v2.6.0/examples/streetlights-mqtt.yml",
+      "transportHints": [
+        "mqtt"
+      ],
+      "tags": [
+        "public",
+        "security-auth"
+      ],
       "asyncapiVersion": "2.6.0",
       "channelCount": 4,
       "messageCount": 4,
@@ -36,13 +82,28 @@
       "supportedManifestCount": 4,
       "generatedCount": 4,
       "syntaxPassCount": 4,
+      "generatedByTransport": {
+        "kafka": 0,
+        "amqp": 0,
+        "mqtt": 4
+      },
       "success": true,
       "failures": []
     },
     {
       "id": "streetlights-operation-security",
-      "source": "AsyncAPI community examples",
-      "url": "https://raw.githubusercontent.com/asyncapi/spec/v2.6.0/examples/streetlights-operation-security.yml",
+      "profile": "public-pinned",
+      "source": "AsyncAPI community examples (pinned mirror)",
+      "sourceType": "local",
+      "sourceLocation": "tests/fixtures/asyncapi/public/streetlights-operation-security.yml",
+      "upstreamUrl": "https://raw.githubusercontent.com/asyncapi/spec/v2.6.0/examples/streetlights-operation-security.yml",
+      "transportHints": [
+        "kafka"
+      ],
+      "tags": [
+        "public",
+        "security-auth"
+      ],
       "asyncapiVersion": "2.6.0",
       "channelCount": 4,
       "messageCount": 4,
@@ -50,13 +111,28 @@
       "supportedManifestCount": 4,
       "generatedCount": 4,
       "syntaxPassCount": 4,
+      "generatedByTransport": {
+        "kafka": 4,
+        "amqp": 0,
+        "mqtt": 0
+      },
       "success": true,
       "failures": []
     },
     {
       "id": "rpc-client-amqp",
-      "source": "AsyncAPI community examples",
-      "url": "https://raw.githubusercontent.com/asyncapi/spec/v2.6.0/examples/rpc-client.yml",
+      "profile": "public-pinned",
+      "source": "AsyncAPI community examples (pinned mirror)",
+      "sourceType": "local",
+      "sourceLocation": "tests/fixtures/asyncapi/public/rpc-client-amqp.yml",
+      "upstreamUrl": "https://raw.githubusercontent.com/asyncapi/spec/v2.6.0/examples/rpc-client.yml",
+      "transportHints": [
+        "amqp"
+      ],
+      "tags": [
+        "public",
+        "routing-complexity"
+      ],
       "asyncapiVersion": "2.6.0",
       "channelCount": 2,
       "messageCount": 2,
@@ -64,6 +140,219 @@
       "supportedManifestCount": 2,
       "generatedCount": 2,
       "syntaxPassCount": 2,
+      "generatedByTransport": {
+        "kafka": 0,
+        "amqp": 2,
+        "mqtt": 0
+      },
+      "success": true,
+      "failures": []
+    },
+    {
+      "id": "kafka-events-fixture",
+      "profile": "edge-case",
+      "source": "OSSP fixture corpus",
+      "sourceType": "local",
+      "sourceLocation": "tests/fixtures/asyncapi/kafka-events.yaml",
+      "upstreamUrl": null,
+      "transportHints": [
+        "kafka"
+      ],
+      "tags": [
+        "edge-case",
+        "retry-dlq",
+        "consumer-config"
+      ],
+      "asyncapiVersion": "2.6.0",
+      "channelCount": 2,
+      "messageCount": 2,
+      "manifestCount": 2,
+      "supportedManifestCount": 2,
+      "generatedCount": 2,
+      "syntaxPassCount": 2,
+      "generatedByTransport": {
+        "kafka": 2,
+        "amqp": 0,
+        "mqtt": 0
+      },
+      "success": true,
+      "failures": []
+    },
+    {
+      "id": "kafka-patterns-fixture",
+      "profile": "edge-case",
+      "source": "OSSP fixture corpus",
+      "sourceType": "local",
+      "sourceLocation": "tests/fixtures/asyncapi/validation/kafka-patterns-v2.yaml",
+      "upstreamUrl": null,
+      "transportHints": [
+        "kafka"
+      ],
+      "tags": [
+        "edge-case",
+        "retry-dlq",
+        "routing-complexity"
+      ],
+      "asyncapiVersion": "2.6.0",
+      "channelCount": 3,
+      "messageCount": 3,
+      "manifestCount": 3,
+      "supportedManifestCount": 3,
+      "generatedCount": 3,
+      "syntaxPassCount": 3,
+      "generatedByTransport": {
+        "kafka": 3,
+        "amqp": 0,
+        "mqtt": 0
+      },
+      "success": true,
+      "failures": []
+    },
+    {
+      "id": "kafka-schema-registry-fixture",
+      "profile": "edge-case",
+      "source": "OSSP fixture corpus",
+      "sourceType": "local",
+      "sourceLocation": "tests/fixtures/asyncapi/kafka-schema-registry.yaml",
+      "upstreamUrl": null,
+      "transportHints": [
+        "kafka"
+      ],
+      "tags": [
+        "edge-case",
+        "schema-registry"
+      ],
+      "asyncapiVersion": "2.6.0",
+      "channelCount": 2,
+      "messageCount": 2,
+      "manifestCount": 2,
+      "supportedManifestCount": 2,
+      "generatedCount": 2,
+      "syntaxPassCount": 2,
+      "generatedByTransport": {
+        "kafka": 2,
+        "amqp": 0,
+        "mqtt": 0
+      },
+      "success": true,
+      "failures": []
+    },
+    {
+      "id": "amqp-notifications-fixture",
+      "profile": "edge-case",
+      "source": "OSSP fixture corpus",
+      "sourceType": "local",
+      "sourceLocation": "tests/fixtures/asyncapi/amqp-notifications.yaml",
+      "upstreamUrl": null,
+      "transportHints": [
+        "amqp"
+      ],
+      "tags": [
+        "edge-case",
+        "routing-complexity",
+        "retry-dlq"
+      ],
+      "asyncapiVersion": "2.6.0",
+      "channelCount": 2,
+      "messageCount": 2,
+      "manifestCount": 2,
+      "supportedManifestCount": 2,
+      "generatedCount": 2,
+      "syntaxPassCount": 2,
+      "generatedByTransport": {
+        "kafka": 0,
+        "amqp": 2,
+        "mqtt": 0
+      },
+      "success": true,
+      "failures": []
+    },
+    {
+      "id": "amqp-patterns-fixture",
+      "profile": "edge-case",
+      "source": "OSSP fixture corpus",
+      "sourceType": "local",
+      "sourceLocation": "tests/fixtures/asyncapi/validation/amqp-patterns-v2.yaml",
+      "upstreamUrl": null,
+      "transportHints": [
+        "amqp"
+      ],
+      "tags": [
+        "edge-case",
+        "routing-complexity",
+        "retry-dlq"
+      ],
+      "asyncapiVersion": "2.6.0",
+      "channelCount": 3,
+      "messageCount": 3,
+      "manifestCount": 3,
+      "supportedManifestCount": 3,
+      "generatedCount": 3,
+      "syntaxPassCount": 3,
+      "generatedByTransport": {
+        "kafka": 0,
+        "amqp": 3,
+        "mqtt": 0
+      },
+      "success": true,
+      "failures": []
+    },
+    {
+      "id": "mqtt-patterns-fixture",
+      "profile": "edge-case",
+      "source": "OSSP fixture corpus",
+      "sourceType": "local",
+      "sourceLocation": "tests/fixtures/asyncapi/validation/mqtt-patterns-v2.yaml",
+      "upstreamUrl": null,
+      "transportHints": [
+        "mqtt"
+      ],
+      "tags": [
+        "edge-case",
+        "routing-complexity",
+        "qos-retain"
+      ],
+      "asyncapiVersion": "2.6.0",
+      "channelCount": 3,
+      "messageCount": 3,
+      "manifestCount": 3,
+      "supportedManifestCount": 3,
+      "generatedCount": 3,
+      "syntaxPassCount": 3,
+      "generatedByTransport": {
+        "kafka": 0,
+        "amqp": 0,
+        "mqtt": 3
+      },
+      "success": true,
+      "failures": []
+    },
+    {
+      "id": "mqtt-telemetry-fixture",
+      "profile": "edge-case",
+      "source": "OSSP fixture corpus",
+      "sourceType": "local",
+      "sourceLocation": "tests/fixtures/asyncapi/mqtt-telemetry.yaml",
+      "upstreamUrl": null,
+      "transportHints": [
+        "mqtt"
+      ],
+      "tags": [
+        "edge-case",
+        "qos-retain"
+      ],
+      "asyncapiVersion": "2.6.0",
+      "channelCount": 2,
+      "messageCount": 2,
+      "manifestCount": 2,
+      "supportedManifestCount": 2,
+      "generatedCount": 2,
+      "syntaxPassCount": 2,
+      "generatedByTransport": {
+        "kafka": 0,
+        "amqp": 0,
+        "mqtt": 2
+      },
       "success": true,
       "failures": []
     }

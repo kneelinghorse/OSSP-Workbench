@@ -1,0 +1,92 @@
+asyncapi: '2.6.0'
+info:
+  title: AMQP Pattern Validation Fixture
+  version: '1.0.0'
+  description: AsyncAPI 2.6 fixture for routing, retry, and DLQ semantics.
+
+servers:
+  production:
+    url: amqp://rabbitmq.example.com:5672
+    protocol: amqp
+
+channels:
+  customer.events.verified:
+    bindings:
+      amqp:
+        is: routingKey
+        exchange:
+          name: customer.events
+          type: topic
+          durable: true
+        queue:
+          name: customer.verified.queue
+          durable: true
+        routingKey: customer.verified
+    subscribe:
+      message:
+        name: CustomerVerified
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            customerId:
+              type: string
+            verifiedAt:
+              type: string
+              format: date-time
+
+  order.events.shipped:
+    bindings:
+      amqp:
+        is: routingKey
+        exchange:
+          name: order.events
+          type: topic
+          durable: true
+        queue:
+          name: order.shipped.queue
+          durable: true
+          arguments:
+            x-max-retries: 3
+            x-message-ttl: 60000
+        routingKey: order.shipped
+    subscribe:
+      message:
+        name: OrderShipped
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            orderId:
+              type: string
+            shippedAt:
+              type: string
+              format: date-time
+
+  user.events.registered:
+    bindings:
+      amqp:
+        is: routingKey
+        exchange:
+          name: user.events
+          type: topic
+          durable: true
+        queue:
+          name: user.registered.queue
+          durable: true
+          arguments:
+            x-dead-letter-exchange: user.events.dlq
+            x-max-retries: 5
+        routingKey: user.registered
+    subscribe:
+      message:
+        name: UserRegistered
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            userId:
+              type: string
+            email:
+              type: string
+              format: email

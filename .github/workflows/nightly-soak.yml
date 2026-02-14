@@ -1,0 +1,59 @@
+name: Nightly Soak & Performance Budgets
+
+on:
+  schedule:
+    - cron: '30 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  soak:
+    name: Consumer Generator Soak
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate real-world AsyncAPI corpus
+        run: npm run validate:asyncapi:realworld
+
+      - name: Run soak benchmark
+        run: SOAK_ITERATIONS=8 npm run validate:soak:performance
+
+      - name: Enforce soak performance budgets
+        run: npm run check:soak:budget
+
+      - name: Publish soak summary
+        run: |
+          node -e "const fs=require('fs'); const report=JSON.parse(fs.readFileSync('reports/consumer-soak-performance.json','utf8')); const out=process.env.GITHUB_STEP_SUMMARY; const lines=[
+            '## Nightly Soak Summary',
+            '',
+            `- Iterations: ${report.soak.iterations}`,
+            `- Fixture runs: ${report.soak.fixtureRuns}`,
+            `- Generated manifests: ${report.soak.generatedManifests}`,
+            `- Import p95: ${report.metrics.importMs.p95.toFixed(2)}ms`,
+            `- Generation p95: ${report.metrics.generationMs.p95.toFixed(2)}ms`,
+            `- Max heap: ${report.metrics.memoryMb.max.toFixed(2)}MB`,
+            `- Failures: ${report.metrics.failures.count}`,
+          ]; fs.appendFileSync(out, lines.join('\n') + '\n');"
+
+      - name: Upload soak artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-soak-reports
+          path: |
+            reports/consumer-soak-performance.json
+            reports/real-world-asyncapi-validation.json
+            reports/real-world-asyncapi-validation.md

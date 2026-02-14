@@ -1,0 +1,63 @@
+asyncapi: '2.6.0'
+info:
+  title: MQTT Pattern Validation Fixture
+  version: '1.0.0'
+  description: AsyncAPI 2.6 fixture for QoS/retain and fanout-related detection.
+
+servers:
+  production:
+    url: mqtt://mqtt.example.com:1883
+    protocol: mqtt
+
+channels:
+  device/telemetry/temperature:
+    bindings:
+      mqtt:
+        qos: 1
+        retain: false
+    publish:
+      message:
+        name: TemperatureReading
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            deviceId:
+              type: string
+            temperature:
+              type: number
+
+  sensor/events/alert:
+    bindings:
+      mqtt:
+        qos: 1
+        retain: true
+    publish:
+      message:
+        name: SensorAlert
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            sensorId:
+              type: string
+            severity:
+              type: string
+              enum: [low, medium, high]
+
+  device/commands/reboot:
+    bindings:
+      mqtt:
+        qos: 2
+        retain: false
+    subscribe:
+      message:
+        name: RebootCommand
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            commandId:
+              type: string
+            deviceId:
+              type: string

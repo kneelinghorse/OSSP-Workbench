@@ -97,21 +97,36 @@ Run public-spec validation:
 npm run validate:asyncapi:realworld
 ```
 
+Validation corpus is tracked in:
+
+- `scripts/validation/asyncapi-fixture-corpus.js`
+
 Latest run summary (`reports/real-world-asyncapi-validation.md`):
 
-- Specs tested: `4`
-- Specs passed: `4`
+- Tracked fixture corpus: `11`
+- Specs tested: `11`
+- Specs passed: `11`
 - Import failures: `0`
 - Generation failures: `0`
 - Syntax failures: `0`
-- Supported manifests generated: `14/14`
+- Supported manifests generated: `31/31`
 
-Validated public/community specs:
+Validated public/community pinned examples:
 
 - AsyncAPI `streetlights-kafka` (`v2.6.0`)
 - AsyncAPI `streetlights-mqtt` (`v2.6.0`)
 - AsyncAPI `streetlights-operation-security` (`v2.6.0`)
 - AsyncAPI `rpc-client` (`v2.6.0`)
+
+Validated OSSP edge-case fixtures:
+
+- `kafka-events-fixture`
+- `kafka-patterns-fixture`
+- `kafka-schema-registry-fixture`
+- `amqp-notifications-fixture`
+- `amqp-patterns-fixture`
+- `mqtt-patterns-fixture`
+- `mqtt-telemetry-fixture`
 
 ## Architecture
 
@@ -143,7 +158,14 @@ Key directories:
 ```bash
 npm run test:packaging
 npm run validate:asyncapi:realworld
+npm run validate:soak:performance
+npm run check:soak:budget
+npm run test:golden:compat
 npm run test:integration:brokers
 ```
 
 `test:integration:brokers` requires a running Docker-compatible container runtime for Testcontainers.
+Soak budget thresholds are defined in `config/soak-performance-budgets.json`.
+Nightly soak CI runs in `.github/workflows/nightly-soak.yml`.
+Golden fixtures are in `tests/fixtures/golden/consumers/`; refresh intentionally changed outputs with `npm run test:golden:update`.
+Release governance checklist and gates are documented in `docs/release-governance.md`.
